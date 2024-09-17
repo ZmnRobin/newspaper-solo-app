@@ -1,0 +1,67 @@
+import React from "react";
+import Link from "next/link";
+import { Article } from "@/configs/types";
+import Image from "next/image";
+import { convertDateFormat, formatedDate } from "@/utils/sharedFunction";
+
+interface NewsListProps {
+  article: Article;
+  featured?: boolean;
+  mediumFeature?: boolean;
+}
+
+export default function NewsCard({
+  article,
+  featured = false,
+  mediumFeature = false,
+}: NewsListProps) {
+  return (
+    <div className={`bg-white overflow-hidden ${featured ? "h-full" : ""}`}>
+       <Link href={`/${article.id}`}><div
+        className={`relative ${
+          featured ? "h-96" : mediumFeature ? "h-48" : "h-48"
+        }`}
+      >
+        {article.thumbnail ? (
+          <Image
+            src={article?.thumbnail as string}
+            alt={article?.title as string}
+            layout="fill"
+            objectFit="cover"
+          />
+        ) : (
+          <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+            <span className="text-gray-400">No image available</span>
+          </div>
+        )}
+      </div>
+      </Link>
+      <div className="pt-4">
+        <Link href={`/${article.id}`} className="hover:text-blue-500">
+          {" "}
+          <h1
+            className={`mb-2 ${
+              featured ? "text-6xl" : mediumFeature ? "text-3xl" : "text-2xl"
+            }`}
+          >
+            {article?.title}
+          </h1>
+        </Link>
+        <p className="text-xs text-gray-500 mb-2">
+          {article?.User.name} - {convertDateFormat(article?.createdAt.toString())}
+        </p>
+        <p
+          className={`text-gray-700 mb-4 ${
+            featured
+              ? "line-clamp-4"
+              : mediumFeature
+              ? "line-clamp-3"
+              : "line-clamp-2"
+          }`}
+        >
+          {article?.content}
+        </p>
+      </div>
+    </div>
+  );
+}

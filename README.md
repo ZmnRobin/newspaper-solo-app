@@ -1,0 +1,1 @@
+# newspaper-solo-app
