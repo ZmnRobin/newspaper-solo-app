@@ -7,10 +7,11 @@ interface NewsListProps {
 }
 
 export default function NewsList({ articles }: NewsListProps) {
+  console.log(articles);
   if (articles.length === 0) {
     return <div className="text-2xl m-4">No article found.</div>;
   }
-  const [secondFeature,featured, thirdFeature, ...restArticles] = articles;
+  const [featured,secondFeature,thirdFeature, ...restArticles] = articles;
 
   return (
     <div className="grid gap-6 grid-cols-6 auto-rows-auto m-5">

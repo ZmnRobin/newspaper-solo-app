@@ -52,6 +52,16 @@ export const getCommentsByArticle=async (articleId:any)=>{
   }
 }
 
+export const getArticlesByAuthor=async (authorId:any)=>{
+  try {
+    const response = await axiosInstance.get(`/articles/author/${authorId}`);
+    return response.data;
+  } catch (error) {
+    console.error(`Error fetching articles by author:`, error);
+    throw error;
+  }
+}
+
 export const getArticlesByGenre=async (genreId:any)=>{
   try {
     const response = await axios.get(`${backendUrl}/articles/genre/${genreId}`);
@@ -68,6 +78,16 @@ export const getRelatedArticles=async (articleId:any)=>{
     return response.data;
   } catch (error) {
     console.error(`Error fetching related articles:`, error);
+    throw error;
+  }
+}
+
+export const deleteArticleById=async (articleId:any)=>{
+  try {
+    const response = await axiosInstance.delete(`/articles/${articleId}`);
+    return response.data;
+  } catch (error) {
+    console.error(`Error deleting article:`, error);
     throw error;
   }
 }

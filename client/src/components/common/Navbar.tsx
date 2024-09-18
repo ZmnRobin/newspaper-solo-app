@@ -69,7 +69,7 @@ export default function Navbar() {
             </Link>
           ) : (
             <div className="flex items-center space-x-4">
-              <span>{user.name}</span>
+              <Link href="/profile">{user.name}</Link>
               <Link href="/create-article">
                 <button className="bg-blue-600 text-white px-3 py-1">
                   Create

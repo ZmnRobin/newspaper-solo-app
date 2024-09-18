@@ -1,30 +1,30 @@
 export interface User {
-    id: Number;
-    name:String;
-    email: String;
-    password: String;
-    role: String;
+    id: number;
+    name:string;
+    email: string;
+    password: string;
+    role: string;
     createdAt: Date;
     updatedAt: Date;
 }
 export interface Articles {
-    id: Number;
-    title: String;
-    content: String;
-    thumbnail?: String;
+    id: number;
+    title: string;
+    content: string;
+    thumbnail?: string;
     published_at: Date;
-    author_id: String;
+    author_id: string;
     createdAt: Date;
     updatedAt: Date;
     User: User;
 }
 export interface Article{
-    id: Number;
-    title: String;
-    content: String;
-    thumbnail?: String;
+    id: number;
+    title: string;
+    content: string;
+    thumbnail?: string;
     published_at: Date;
-    author_id: String;
+    author_id: string;
     createdAt: Date;
     updatedAt: Date;
     User: User;

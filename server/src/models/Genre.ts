@@ -1,21 +1,23 @@
-import { DataTypes, Model, Optional, Sequelize } from 'sequelize';
+import { DataTypes, Model, Optional, Sequelize, Association } from 'sequelize';
+import { Article } from './Article'; // Import the Article model
 
-// Define the attributes for the Genre model
 interface GenreAttributes {
-  id: Number;
-  name: String;
+  id: number;
+  name: string;
 }
 
-// Optional fields for creating a new Genre (id is optional)
 interface GenreCreationAttributes extends Optional<GenreAttributes, 'id'> {}
 
-// Extend the Sequelize Model class
 class Genre extends Model<GenreAttributes, GenreCreationAttributes> implements GenreAttributes {
-  public id!: Number;
-  public name!: String;
+  public id!: number;
+  public name!: string;
+
+  // Define the association with Article
+  public static associations: {
+    articles: Association<Genre, Article>;
+  };
 }
 
-// Function to initialize the model
 const initGenreModel = (sequelize: Sequelize) => {
   Genre.init({
     id: {
@@ -30,11 +32,12 @@ const initGenreModel = (sequelize: Sequelize) => {
   }, {
     sequelize,
     modelName: 'Genre',
-    tableName: 'Genres', // Explicitly define the table name
-    timestamps: false, // No createdAt and updatedAt fields needed for genres
+    tableName: 'Genres',
+    timestamps: false,
   });
 
   return Genre;
 };
 
+export { Genre, GenreAttributes, GenreCreationAttributes };
 export default initGenreModel;

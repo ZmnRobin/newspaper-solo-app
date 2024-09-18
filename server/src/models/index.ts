@@ -51,7 +51,7 @@ db.genres = initGenreModel(sequelize);
 // Define relationships after models are initialized
 db.articles.belongsTo(db.users, { foreignKey: 'author_id' });
 db.comments.belongsTo(db.users, { foreignKey: 'user_id' });
-db.comments.belongsTo(db.articles, { foreignKey: 'article_id' });
+db.comments.belongsTo(db.articles, { foreignKey: 'article_id', onDelete: 'CASCADE' });
 // Many-to-many relationship between Articles and Genres
 db.articles.belongsToMany(db.genres, { through: 'ArticleGenres' ,foreignKey: 'article_id' });
 db.genres.belongsToMany(db.articles, { through: 'ArticleGenres', foreignKey: 'genre_id' });

@@ -38,6 +38,7 @@ export const getSingleArticle = async (req: Request, res: Response): Promise<Res
     return res.status(500).json({ message: 'Internal server error' });
   }
 };
+
 export const getArticlesByGenre = async (req: Request, res: Response): Promise<Response> => {
   const { genreId } = req.params;
   try {
@@ -66,6 +67,26 @@ export const getArticlesByGenre = async (req: Request, res: Response): Promise<R
     return res.status(500).json({ message: 'Internal server error' });
   }
 };
+
+export const getArticlesByAuthor = async (req: Request, res: Response): Promise<Response> => {
+  const { authorId } = req.params;
+  try {
+    const articles = await Article.findAll({
+      where: { author_id: authorId },
+      include: [User],
+      order: [['createdAt', 'DESC']], // Optional: sort by newest first
+    });
+
+    if (articles.length > 0) {
+      return res.status(200).json(articles);
+    } else {
+      return res.status(404).json([]);
+    }
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: 'Internal server error' });
+  }
+}
 
 export const getRelatedArticles = async (req: Request, res: Response): Promise<Response> => {
   const { articleId } = req.params;
@@ -113,15 +134,20 @@ export const getRelatedArticles = async (req: Request, res: Response): Promise<R
 };
 
 export const createArticle = async (req: AuthRequest, res: Response): Promise<Response> => {
-  const { title, content, thumbnail, genreIds } = req.body; // Add genreIds to request body
+  const { title, content, genreIds } = req.body;
   const userId = req.user?.id;
 
+  // Get the uploaded file (if it exists)
+  const thumbnail = req.file ? `/uploads/${req.file.filename}` : null;
+
+  console.log('thumbnail', thumbnail, req.file);
+
   try {
-    // Create the article
+    // Create the article in the database
     const newArticle = await Article.create({
       title,
       content,
-      thumbnail,
+      thumbnail, // Save the file path to the thumbnail field
       author_id: userId,
     });
 
@@ -130,7 +156,7 @@ export const createArticle = async (req: AuthRequest, res: Response): Promise<Re
       const genres = await db.genres.findAll({
         where: { id: genreIds }
       });
-      await newArticle.addGenres(genres); // Add genres to the article
+      await newArticle.addGenres(genres); // Associate genres with the article
     }
 
     return res.status(201).json(newArticle);

@@ -2,7 +2,7 @@ import React from "react";
 import Link from "next/link";
 import { Article } from "@/configs/types";
 import Image from "next/image";
-import { convertDateFormat, formatedDate } from "@/utils/sharedFunction";
+import { convertDateFormat, formatedDate, getImageSrc } from "@/utils/sharedFunction";
 
 interface NewsListProps {
   article: Article;
@@ -15,29 +15,27 @@ export default function NewsCard({
   featured = false,
   mediumFeature = false,
 }: NewsListProps) {
+
   return (
     <div className={`bg-white overflow-hidden ${featured ? "h-full" : ""}`}>
-       <Link href={`/${article.id}`}><div
-        className={`relative ${
-          featured ? "h-96" : mediumFeature ? "h-48" : "h-48"
-        }`}
-      >
-        {article.thumbnail ? (
-          <Image
-            src={article?.thumbnail as string}
-            alt={article?.title as string}
-            layout="fill"
-            objectFit="cover"
-          />
-        ) : (
-          <div className="w-full h-full bg-gray-200 flex items-center justify-center">
-            <span className="text-gray-400">No image available</span>
-          </div>
-        )}
-      </div>
+       <Link href={`/${article?.id}`}>
+        <div className={`relative ${featured ? 'h-96' : mediumFeature ? 'h-48' : 'h-48'}`}>
+          {article?.thumbnail ? (
+            <Image
+              src={getImageSrc(article?.thumbnail)}
+              alt={article?.title as string}
+              layout="fill"
+              objectFit="cover"
+            />
+          ) : (
+            <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+              <span className="text-gray-400">No image available</span>
+            </div>
+          )}
+        </div>
       </Link>
       <div className="pt-4">
-        <Link href={`/${article.id}`} className="hover:text-blue-500">
+        <Link href={`/${article?.id}`} className="hover:text-blue-500">
           {" "}
           <h1
             className={`mb-2 ${

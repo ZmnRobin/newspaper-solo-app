@@ -1,33 +1,39 @@
+// articleRoute.ts
 import express from 'express';
-import { createArticle, getAllArticles, getSingleArticle,deleteArticle, getArticlesByGenre,getRelatedArticles } from '../controllers/articleController';
+import { createArticle, getAllArticles, getSingleArticle, deleteArticle, getArticlesByGenre, getRelatedArticles,getArticlesByAuthor } from '../controllers/articleController';
 import verifyToken from '../middlewares/authMiddleware';  
 import { createComment, getCommentsByArticle } from '../controllers/commentController';
+import { Multer } from 'multer';
 
-const router = express.Router();
+export default function(upload: Multer) {
+  const router = express.Router();
 
-// Get all articles
-router.get('/', getAllArticles);
+  // Get all articles
+  router.get('/', getAllArticles);
 
-// Get a single article by ID
-router.get('/:id', getSingleArticle);
+  // Get a single article by ID
+  router.get('/:id', getSingleArticle);
 
-// Create a new article (protected route)
-router.post('/', verifyToken, createArticle);
+  // Create a new article (protected route) with single image upload
+  router.post("/", verifyToken, upload.single('thumbnail'), createArticle);
 
-// Delete an article (protected route)
-router.delete('/:id', verifyToken, deleteArticle);
+  // Delete an article (protected route)
+  router.delete('/:id', verifyToken, deleteArticle);
 
-// Get article based on genre
-router.get('/genre/:genreId', getArticlesByGenre);
+  // Get article based on author
+  router.get('/author/:authorId',verifyToken,getArticlesByAuthor);
 
-// Get related articles
-router.get('/:articleId/related', getRelatedArticles);
+  // Get article based on genre
+  router.get('/genre/:genreId', getArticlesByGenre);
 
-// Create a new comment (protected route)
-router.post('/:articleId/comments', verifyToken, createComment);
+  // Get related articles
+  router.get('/:articleId/related', getRelatedArticles);
 
-// Get all comments for a specific article
-router.get('/:articleId/comments', getCommentsByArticle);
+  // Create a new comment (protected route)
+  router.post('/:articleId/comments', verifyToken, createComment);
 
+  // Get all comments for a specific article
+  router.get('/:articleId/comments', getCommentsByArticle);
 
-export default router;
+  return router;
+}

@@ -9,8 +9,9 @@ import React, { useEffect, useState } from "react";
 import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
 import Modal from "./Modal";
-import { convertDateFormat } from "@/utils/sharedFunction";
+import { convertDateFormat, getImageSrc } from "@/utils/sharedFunction";
 import Link from "next/link";
+
 
 interface SingleArticleProps {
   article: Articles;
@@ -96,18 +97,17 @@ export default function SingleArticle({ article }: SingleArticleProps) {
         {/* Middle column - Article content */}
         <div className="lg:col-span-7 space-y-6">
           <h1 className="text-4xl font-bold">{article.title}</h1>
-          {article.thumbnail && (
+          {article?.thumbnail && (
             <div className="relative h-64 md:h-96">
               <Image
-                src={article?.thumbnail as string}
-                alt={article?.title as string}
-                layout="fill"
-                objectFit="cover"
-                className=""
+                  src={getImageSrc(article?.thumbnail)}
+                  alt={article?.title as string}
+                  layout="fill"
+                  objectFit="cover"
               />
             </div>
           )}
-          <div className="prose max-w-none">
+          <div className="prose max-w-none text-xl font-medium">
             {article.content.split("\n").map((paragraph, index) => (
               <p key={index}>{paragraph}</p>
             ))}
@@ -122,7 +122,7 @@ export default function SingleArticle({ article }: SingleArticleProps) {
                 onChange={(e) => setComment(e.target.value)}
                 required
               ></textarea>
-              <button className="bg-blue-500 text-white px-4 py-2 mt-2">
+              <button className="bg-blue-500 text-white px-4 py-2 mt-2 items-end">
                 Create Comment
               </button>
             </form>
@@ -149,23 +149,25 @@ export default function SingleArticle({ article }: SingleArticleProps) {
             <div className="space-y-4">
               {/* Related articles logic */}
               {relatedArticles?.map((article, index) => (
-                <div key={index} className="flex space-x-4">
+                <div key={index} className="">
                   {/* Container with fixed dimensions */}
-                  <div className="relative w-24 h-24">
+                  <Link href={`/${article.id}`}><div className="relative w-full h-40">
                     <Image
-                      src={article?.thumbnail as string}
-                      alt={article?.title as string}
+                        src={getImageSrc(article?.thumbnail || "")}
+                        alt={article?.title as string}
                       fill // This replaces layout="fill"
                       objectFit="cover"
-                      className="rounded-lg"
+                      className=""
                     />
-                  </div>
-                  <div>
+                  </div></Link>
+                  <div className="mt-1">
                     <Link href={`/${article.id}`}>
-                      <h3 className="font-semibold">{article?.title}</h3>
+                      <h3 className="font-semibold hover:text-sky-500">{article?.title}</h3>
                     </Link>
                     <p className="text-sm text-gray-500">
-                      {article?.User.name}
+                      {article?.User.name} . <span className="text-xs text-gray-500">
+                      {convertDateFormat(article?.createdAt.toString())}
+                    </span>
                     </p>
                   </div>
                 </div>
