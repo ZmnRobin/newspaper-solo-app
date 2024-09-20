@@ -58,7 +58,7 @@ export default function ArticleCard({
         <p
           className={`text-gray-700 mb-4 ${
             featured
-              ? "line-clamp-6"
+              ? "line-clamp-[9]"
               : mediumFeature
               ? "line-clamp-2"
               : "line-clamp-2"

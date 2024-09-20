@@ -16,8 +16,6 @@ export const login = async (email: string, password: string) => {
   if (response.data) {
     Cookies.set("token", response.data.token);
     Cookies.set("user", JSON.stringify(response.data.user));
-    // Trigger a custom event for login
-    window.dispatchEvent(new Event("userLoggedIn"));
   }
   return response.data;
 };

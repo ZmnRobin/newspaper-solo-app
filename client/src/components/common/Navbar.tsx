@@ -3,14 +3,14 @@ import { use, useEffect, useState } from "react";
 import { formatedDate } from "@/utils/sharedFunction";
 import Link from "next/link";
 import { FaSearch } from "react-icons/fa";
-import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
 import { getAllGenres } from "@/services/newsService";
+import { useUser } from "../context/userContext";
 
 export default function Navbar() {
+  const { user, logout } = useUser();
   const [showSearch, setShowSearch] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-  const [user, setUser] = useState<any>(null);
   const [categories, setCategories] = useState<any>([]);
   const router = useRouter();
 
@@ -25,41 +25,12 @@ export default function Navbar() {
     }
   };
 
-  // Check for user login state
-  useEffect(() => {
-    const userData = Cookies.get("user");
-    if (userData) {
-      setUser(JSON.parse(userData));
-    }
-
-    // Listen for login event
-    const handleLogin = () => {
-      const updatedUserData = Cookies.get("user");
-      if (updatedUserData) {
-        setUser(JSON.parse(updatedUserData));
-      }
-    };
-
-    window.addEventListener("userLoggedIn", handleLogin);
-
-    return () => {
-      window.removeEventListener("userLoggedIn", handleLogin);
-    };
-  }, []);
-
   // Fetch categories
   useEffect(() => {
     getAllGenres().then((data) => {
       setCategories(data);
     });
   }, []);
-
-  const handleLogout = () => {
-    Cookies.remove("token");
-    Cookies.remove("user");
-    setUser(null);
-    router.push("/");
-  };
 
   return (
     <nav className="container mx-auto">
@@ -72,8 +43,8 @@ export default function Navbar() {
         </div>
         <div className="w-20 flex items-center justify-end">
           {!user ? (
-            <Link href={"/signup"}>
-              <button className="bg-black text-white px-3 py-1">Sign Up</button>
+            <Link href={"/login"}>
+              <button className="bg-black text-white px-3 py-1">Login</button>
             </Link>
           ) : (
             <div className="flex items-center space-x-4">
@@ -84,7 +55,7 @@ export default function Navbar() {
                 </button>
               </Link>
               <button
-                onClick={handleLogout}
+                onClick={logout}
                 className="bg-red-600 text-white px-3 py-1"
               >
                 Logout

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import Navbar from "@/components/common/Navbar";
 import Footer from "@/components/common/Footer";
+import { UserProvider } from "@/components/context/userContext";
 
 export const metadata: Metadata = {
   title: "The Newspaper App",
@@ -16,11 +17,13 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <div className="border bottom-2">
-          <Navbar />
-        </div>
-        <div className="container mx-auto">{children}</div>
-        <Footer />
+       <UserProvider>
+          <div className="border bottom-2">
+            <Navbar />
+          </div>
+          <div className="container mx-auto">{children}</div>
+          <Footer />
+        </UserProvider>
       </body>
     </html>
   );

@@ -3,8 +3,10 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { login } from '@/services/authService';
 import Link from 'next/link';
+import { useUser } from '../context/userContext';
 
 const Login: React.FC = () => {
+  const { setUser } = useUser();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -13,7 +15,8 @@ const Login: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await login(email, password);
+      const data = await login(email, password);
+      setUser(data.user);
       router.push('/');
     } catch (err) {
       setError('Invalid email or password');

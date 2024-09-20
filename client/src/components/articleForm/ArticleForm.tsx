@@ -81,6 +81,7 @@ export default function ArticleForm({ article, editId }: ArticleFormProps) {
           },
         });
         alert("Article updated successfully!");
+        router.push("/profile");
       } else {
         // Create new article
         await axiosInstance.post(`${backendUrl}/articles`, formData, {
@@ -89,8 +90,8 @@ export default function ArticleForm({ article, editId }: ArticleFormProps) {
           },
         });
         alert("Article created successfully!");
+        router.push("/");
       }
-      router.push("/profile");
     } catch (error) {
       console.error(editId ? "Error updating article" : "Error creating article", error);
       alert("An error occurred while submitting the article");

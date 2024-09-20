@@ -12,9 +12,13 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
+  if (pathname === "/edit-article" && !token) {
+    return NextResponse.redirect(new URL("/login", request.url));
+  }
+
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/create-article", "/profile"],
+  matcher: ["/create-article", "/profile", "/edit-article"],
 };

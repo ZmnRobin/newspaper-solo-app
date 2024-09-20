@@ -8,7 +8,7 @@ interface ArticleListProps {
 
 export default function ArticleList({ articles }: ArticleListProps) {
   if (articles.length === 0) {
-    return <div className="text-2xl m-4">No article found.</div>;
+    return <div className="text-3xl m-4 text-center">No article found.</div>;
   }
 
   const [secondFeature,thirdFeature,featured, fourthFeature, fifthFeature, ...restArticles] = articles;
@@ -23,7 +23,7 @@ export default function ArticleList({ articles }: ArticleListProps) {
         </div>
 
         {/* Center Featured Article (spans 4 columns and 2 rows) */}
-        <div className="col-span-6 md:col-span-3 row-span-2 px-3">
+        <div className="col-span-6 md:col-span-3 row-span-2 px-3 border-r-1">
           <ArticleCard article={featured} featured={true} />
         </div>
 
