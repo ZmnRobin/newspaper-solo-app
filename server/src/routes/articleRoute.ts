@@ -14,7 +14,9 @@ import {
 import verifyToken from "../middlewares/authMiddleware";
 import {
   createComment,
+  deleteComment,
   getCommentsByArticle,
+  updateComment,
 } from "../controllers/commentController";
 import { Multer } from "multer";
 
@@ -53,6 +55,12 @@ export default function (upload: Multer) {
 
   // Get all comments for a specific article
   router.get("/:articleId/comments", getCommentsByArticle);
+  
+  // Delete a comment by it's owner (protected route)
+  router.delete("/:articleId/comments/:commentId", verifyToken, deleteComment);
+
+  // Update a comment by it's owner (protected route)
+  router.put("/:articleId/comments/:commentId", verifyToken, updateComment);
 
   return router;
 }

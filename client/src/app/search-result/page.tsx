@@ -3,12 +3,11 @@ import { searchArticles } from "@/services/newsService";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Article } from "@/configs/types";
-import Image from "next/image";
+import { Articles } from "@/configs/types";
 import { convertDateFormat, getImageSrc } from "@/utils/sharedFunction";
 
 export default function SearchResult() {
-  const [results, setResults] = useState<Article[]>([]);
+  const [results, setResults] = useState<Articles[]>([]);
   const [loading, setLoading] = useState(true);
   const searchParams = useSearchParams();
   const query = searchParams.get("query");

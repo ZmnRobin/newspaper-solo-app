@@ -1,5 +1,5 @@
 "use client";
-import ArticleForm from "@/components/createArticle/ArticleForm";
+import ArticleForm from "@/components/articleForm/ArticleForm";
 import { useParams, useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import axiosInstance from "@/services";

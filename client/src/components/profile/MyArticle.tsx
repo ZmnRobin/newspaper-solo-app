@@ -1,14 +1,13 @@
 import React, { useState } from "react";
-import Modal from "../news/Modal";
+import Modal from "../common/Modal";
 import Link from "next/link";
 import Image from "next/image";
-import { getImageSrc } from "@/utils/sharedFunction";
-import { FaTrash,FaEdit } from "react-icons/fa";
-import { Article } from "@/configs/types";
-
+import { convertDateFormat, getImageSrc } from "@/utils/sharedFunction";
+import { FaTrash, FaEdit } from "react-icons/fa";
+import { Articles } from "@/configs/types";
 
 interface MyArticleProps {
-  articles: Article[];
+  articles: Articles[];
   onDelete: (id: number) => void;
 }
 
@@ -30,9 +29,9 @@ export default function MyArticle({ articles, onDelete }: MyArticleProps) {
 
   return (
     <>
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-4 gap-4">
         {articles.map((article) => (
-          <div key={article.id} className="bg-white border p-4 rounded">
+          <div key={article.id} className="bg-white border p-4">
             <Link href={`/${article.id}`}>
               <div className="relative w-full h-60">
                 <Image
@@ -44,14 +43,21 @@ export default function MyArticle({ articles, onDelete }: MyArticleProps) {
                 />
               </div>
             </Link>
-            <Link href={`/${article.id}`} className="text-lg font-bold mb-2 mt-2 line-clamp-1 hover:text-sky-500">{article.title}</Link>
+            <Link
+              href={`/${article.id}`}
+              className="text-lg font-bold mb-2 mt-2 line-clamp-1 hover:text-sky-500"
+            >
+              {article.title}
+            </Link>
             <p className="text-sm mb-4 line-clamp-4">{article.content}</p>
             <p className="text-xs text-gray-500 mb-4">
-              Published on: {new Date(article.createdAt).toLocaleDateString()}
+              Published on: {convertDateFormat(article.createdAt.toString())}
             </p>
             <div className="flex space-x-2 justify-end">
               <button className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
-                <Link href={`/edit-article/${article.id}`}><FaEdit /></Link>
+                <Link href={`/edit-article/${article.id}`}>
+                  <FaEdit />
+                </Link>
               </button>
               <button
                 className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"

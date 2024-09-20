@@ -1,5 +1,5 @@
 "use client";
-import NewsList from "@/components/news/NewsList";
+import ArticleList from "@/components/articles/ArticleList";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import { getAllNews } from "@/services/newsService";
 import { useEffect, useState } from "react";
@@ -56,7 +56,7 @@ export default function Home() {
     <>
       {loading && <div>Loading...</div>}
       {error && <div>{error}</div>}
-      <NewsList articles={articles} />
+      <ArticleList articles={articles} />
       {isFetching && hasMore && <div>Loading more articles...</div>}
     </>
   );

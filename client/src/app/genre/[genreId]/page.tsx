@@ -1,5 +1,5 @@
 "use client";
-import NewsList from '@/components/news/NewsList';
+import ArticleList from '@/components/articles/ArticleList';
 import { getArticlesByGenre } from '@/services/newsService';
 import { useParams } from 'next/navigation';
 import React, { useEffect, useState } from 'react'
@@ -28,7 +28,7 @@ export default function GenreBasedArticlePage() {
   return (
     <>
       {loading && <div>Loading...</div>}
-      <NewsList articles={articles} />
+      <ArticleList articles={articles} />
     </>
   );
 }

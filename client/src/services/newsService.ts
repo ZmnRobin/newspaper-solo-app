@@ -1,3 +1,4 @@
+// This file contains all the services related to news
 import axios from "axios";
 import axiosInstance from ".";
 import { backendUrl } from "@/configs/constants";
@@ -98,6 +99,26 @@ export const deleteArticleById=async (articleId:any)=>{
     return response.data;
   } catch (error) {
     console.error(`Error deleting article:`, error);
+    throw error;
+  }
+}
+
+export const deleteCommentById=async (articleId:any,commentId:any)=>{
+  try {
+    const response = await axiosInstance.delete(`/articles/${articleId}/comments/${commentId}`);
+    return response.data;
+  } catch (error) {
+    console.error(`Error deleting comment:`, error);
+    throw error;
+  }
+}
+
+export const updateCommentById=async (articleId:any,commentId:any,content:any)=>{
+  try {
+    const response = await axiosInstance.put(`/articles/${articleId}/comments/${commentId}`, { content });
+    return response.data;
+  } catch (error) {
+    console.error(`Error updating comment:`, error);
     throw error;
   }
 }

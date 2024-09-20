@@ -13,7 +13,7 @@ const generateFakeArticles = async (numArticles: number) => {
     }
 
     // Get or create genres
-    const genreNames = ['Technology', 'Science', 'Politics', 'Sports', 'Entertainment', 'Health', 'Business', 'Travel'];
+    const genreNames = ['Bangladesh','International','Top','Today','Technology', 'Science', 'Politics', 'Sports', 'Entertainment', 'Health', 'Business', 'Travel'];
     const genres = await Promise.all(
       genreNames.map(name => db.genres.findOrCreate({ where: { name } }))
     );

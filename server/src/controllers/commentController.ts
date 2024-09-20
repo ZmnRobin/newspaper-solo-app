@@ -56,3 +56,71 @@ export const getCommentsByArticle = async (req: Request, res: Response): Promise
     return res.status(500).json({ message: 'Internal server error' });
   }
 };
+
+// Delete a comment by it's owner (JWT protected)
+export const deleteComment = async (req: AuthRequest, res: Response): Promise<Response> => {
+  const { articleId, commentId } = req.params;
+  const userId = req.user.id;
+
+  try {
+    // Find the comment by its ID and article ID
+    const comment = await Comment.findOne({
+      where: {
+        id: commentId,
+        article_id: articleId
+      }
+    });
+
+    if (!comment) {
+      return res.status(404).json({ message: 'Comment not found' });
+    }
+
+    // Check if the user is the owner of the comment
+    if (comment.user_id !== userId) {
+      return res.status(403).json({ message: 'Unauthorized' });
+    }
+
+    // Delete the comment
+    await comment.destroy();
+
+    return res.status(204).json({ message: 'Comment deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting comment:', error);
+    return res.status(500).json({ message: 'Internal server error'});
+  }
+};
+
+// Update a comment by it's owner (JWT protected)
+export const updateComment = async (req: AuthRequest, res: Response): Promise<Response> => {
+  const { articleId, commentId } = req.params;
+  const { content } = req.body;
+  const userId = req.user.id;
+
+  try {
+    // Find the comment by its ID and article ID
+    const comment = await Comment.findOne({
+      where: {
+        id: commentId,
+        article_id: articleId
+      }
+    });
+
+    if (!comment) {
+      return res.status(404).json({ message: 'Comment not found' });
+    }
+
+    // Check if the user is the owner of the comment
+    if (comment.user_id !== userId) {
+      return res.status(403).json({ message: 'Unauthorized' });
+    }
+
+    // Update the comment
+    comment.content = content;
+    await comment.save();
+
+    return res.status(200).json(comment);
+  } catch (error) {
+    console.error('Error updating comment:', error);
+    return res.status(500).json({ message: 'Internal server error'});
+  }
+};

@@ -23,16 +23,9 @@ export interface Articles {
     User: User;
     Genres: Genre[];
 }
-export interface Article{
-    genres: any;
+export interface Comment {
     id: number;
-    title: string;
     content: string;
-    thumbnail?: string;
-    published_at: Date;
-    author_id: string;
-    createdAt: Date;
-    updatedAt: Date;
     User: User;
-    Genres: Genre[];
+    createdAt: string;
 }

@@ -1,4 +1,4 @@
-import ArticleForm from '@/components/createArticle/ArticleForm'
+import ArticleForm from '@/components/articleForm/ArticleForm'
 import React from 'react'
 
 export default function CreateArticlePage() {
