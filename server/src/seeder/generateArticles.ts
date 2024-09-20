@@ -1,5 +1,5 @@
 import { faker } from '@faker-js/faker';
-import db from './models'; // Adjust the path to your db instance
+import db from '../models'; // Adjust the path to your db instance
 
 // Function to generate fake articles
 const generateFakeArticles = async (numArticles: number) => {

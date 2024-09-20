@@ -1,9 +1,9 @@
-import { Articles } from "@/configs/types";
+import { Article } from "@/configs/types";
 import React from "react";
 import NewsCard from "./NewsCard";
 
 interface NewsListProps {
-  articles: Articles[];
+  articles: Article[];
 }
 
 export default function NewsList({ articles }: NewsListProps) {

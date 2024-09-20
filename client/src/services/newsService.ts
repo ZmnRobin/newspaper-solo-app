@@ -2,9 +2,9 @@ import axios from "axios";
 import axiosInstance from ".";
 import { backendUrl } from "@/configs/constants";
 
-export const getAllNews = async () => {
+export const getAllNews = async (page:any) => {
   try {
-    const response = await axios.get(`${backendUrl}/articles`);
+    const response = await axios.get(`${backendUrl}/articles?page=${page}&limit=10`);
     return response.data;
   } catch (error) {
     console.error("Error fetching all news:", error);
@@ -78,6 +78,16 @@ export const getRelatedArticles=async (articleId:any)=>{
     return response.data;
   } catch (error) {
     console.error(`Error fetching related articles:`, error);
+    throw error;
+  }
+}
+
+export const searchArticles=async (query:any)=>{
+  try {
+    const response = await axios.get(`${backendUrl}/articles/search?query=${query}`);
+    return response.data;
+  } catch (error) {
+    console.error(`Error searching articles:`, error);
     throw error;
   }
 }

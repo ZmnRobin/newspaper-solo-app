@@ -1,5 +1,4 @@
 "use client";
-import { useParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import Cookies from "js-cookie";
 import { getArticlesByAuthor, deleteArticleById } from "@/services/newsService";
@@ -24,7 +23,9 @@ export default function UserProfilePage() {
 
   const handleDelete = (articleId: number) => {
     deleteArticleById(articleId).then(() => {
-      setArticles((prevArticles) => prevArticles.filter(article => article?.id !== articleId));
+      setArticles((prevArticles) =>
+        prevArticles.filter((article) => article?.id !== articleId)
+      );
     });
   };
 

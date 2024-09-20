@@ -2,7 +2,7 @@ import React from "react";
 import Link from "next/link";
 import { Article } from "@/configs/types";
 import Image from "next/image";
-import { convertDateFormat, formatedDate, getImageSrc } from "@/utils/sharedFunction";
+import { convertDateFormat, getImageSrc } from "@/utils/sharedFunction";
 
 interface NewsListProps {
   article: Article;
@@ -47,6 +47,9 @@ export default function NewsCard({
         </Link>
         <p className="text-xs text-gray-500 mb-2">
           {article?.User.name} - {convertDateFormat(article?.createdAt.toString())}
+        </p>
+        <p className="text-xs text-gray-500 mb-2">
+          {article?.Genres?.map((genre:any) => genre.name).join(" / ")}
         </p>
         <p
           className={`text-gray-700 mb-4 ${

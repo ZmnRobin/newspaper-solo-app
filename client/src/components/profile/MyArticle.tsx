@@ -44,7 +44,7 @@ export default function MyArticle({ articles, onDelete }: MyArticleProps) {
                 />
               </div>
             </Link>
-            <h3 className="text-lg font-bold mb-2 mt-2">{article.title}</h3>
+            <Link href={`/${article.id}`} className="text-lg font-bold mb-2 mt-2 line-clamp-1 hover:text-sky-500">{article.title}</Link>
             <p className="text-sm mb-4 line-clamp-4">{article.content}</p>
             <p className="text-xs text-gray-500 mb-4">
               Published on: {new Date(article.createdAt).toLocaleDateString()}

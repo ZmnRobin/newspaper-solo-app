@@ -7,6 +7,10 @@ export interface User {
     createdAt: Date;
     updatedAt: Date;
 }
+export interface Genre {
+    id: number;
+    name: string;
+};
 export interface Articles {
     id: number;
     title: string;
@@ -17,8 +21,10 @@ export interface Articles {
     createdAt: Date;
     updatedAt: Date;
     User: User;
+    Genres: Genre[];
 }
 export interface Article{
+    genres: any;
     id: number;
     title: string;
     content: string;
@@ -28,4 +34,5 @@ export interface Article{
     createdAt: Date;
     updatedAt: Date;
     User: User;
+    Genres: Genre[];
 }

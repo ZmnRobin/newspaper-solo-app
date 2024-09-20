@@ -9,12 +9,20 @@ import { getAllGenres } from "@/services/newsService";
 
 export default function Navbar() {
   const [showSearch, setShowSearch] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
   const [user, setUser] = useState<any>(null);
   const [categories, setCategories] = useState<any>([]);
   const router = useRouter();
 
   const toggleSearch = () => {
     setShowSearch(!showSearch);
+  };
+
+  const handleSearch = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter" && searchTerm.trim()) {
+      // Redirect to /search-result with the query as a URL parameter
+      router.push(`/search-result?query=${encodeURIComponent(searchTerm)}`);
+    }
   };
 
   // Check for user login state
@@ -106,11 +114,14 @@ export default function Navbar() {
         </div>
         {showSearch && (
           <div className="flex justify-center w-full bg-white m-2 px-10">
-            <input
-              type="text"
-              placeholder="Search articles here ..."
-              className="w-9/12 p-2 text-sm border border-gray-800 focus:ring-0"
-            />
+              <input
+                type="text"
+                placeholder="Search articles here ..."
+                className="w-9/12 p-2 text-sm border border-gray-800 focus:ring-0"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                onKeyDown={handleSearch} 
+              />
             <button
               className="text-4xl ml-4"
               onClick={() => setShowSearch(false)}

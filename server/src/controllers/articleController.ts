@@ -11,10 +11,30 @@ interface AuthRequest extends Request {
 }
 
 export const getAllArticles = async (req: Request, res: Response): Promise<Response> => {
+  const { page = 1, limit = 10 } = req.query;
+
   try {
-    // Sort articles by newest first
-    const articles = await Article.findAll({ include: [User], order: [['createdAt', 'DESC']] });
-    return res.status(200).json(articles);
+    const pageNumber = parseInt(page as string, 10);
+    const limitNumber = parseInt(limit as string, 10);
+    const offset = (pageNumber - 1) * limitNumber;
+
+    // Fetch paginated articles and count total articles
+    const { count, rows: articles } = await Article.findAndCountAll({
+      include: [User, Genre],
+      order: [['createdAt', 'DESC']],
+      limit: limitNumber,
+      offset,
+    });
+
+    // Calculate total pages dynamically
+    const totalPages = Math.ceil(count / limitNumber);
+
+    return res.status(200).json({
+      articles,
+      currentPage: pageNumber,
+      totalPages, // Dynamically calculated based on count
+      totalItems: count,
+    });
   } catch (error) {
     console.error(error);
     return res.status(500).json({ message: 'Internal server error' });
@@ -26,7 +46,7 @@ export const getSingleArticle = async (req: Request, res: Response): Promise<Res
   try {
     // Include genres in the result
     const article = await Article.findByPk(id, {
-      include: [User]
+      include: [User,Genre],
     });
     if (article) {
       return res.status(200).json(article);
@@ -133,6 +153,33 @@ export const getRelatedArticles = async (req: Request, res: Response): Promise<R
   }
 };
 
+export const searchArticles = async (req: Request, res: Response): Promise<Response> => {
+  const { query } = req.query;
+  console.log('query', query);
+  try {
+    const articles = await Article.findAll({
+      where: {
+        [Op.or]: [
+          { title: { [Op.iLike]: `%${query}%` } },
+          { content: { [Op.iLike]: `%${query}%` }
+          }
+        ]
+      },
+      include: [User],
+      order: [['createdAt', 'DESC']],
+    });
+
+    if (articles.length > 0) {
+      return res.status(200).json(articles);
+    } else {
+      return res.status(404).json([]);
+    }
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: 'Internal server error' });
+  }
+}
+
 export const createArticle = async (req: AuthRequest, res: Response): Promise<Response> => {
   const { title, content, genreIds } = req.body;
   const userId = req.user?.id;
@@ -160,6 +207,46 @@ export const createArticle = async (req: AuthRequest, res: Response): Promise<Re
     }
 
     return res.status(201).json(newArticle);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
+// Update article if user is the author
+export const updateArticle = async (req: AuthRequest, res: Response): Promise<Response> => {
+  const { id } = req.params;
+  const { title, content, genreIds } = req.body;
+  const userId = req.user?.id;
+
+  // Get the uploaded file (if it exists)
+  const thumbnail = req.file ? `/uploads/${req.file.filename}` : null;
+
+  try {
+    const article = await Article.findByPk(id);
+    if (!article) {
+      return res.status(404).json({ message: 'Article not found' });
+    }
+
+    if (article.author_id !== userId) {
+      return res.status(403).json({ message: 'You are not authorized to update this article' });
+    }
+
+    // Update the article
+    article.title = title;
+    article.content = content;
+    article.thumbnail = thumbnail || article.thumbnail; // Keep the existing thumbnail if no new one is uploaded
+    await article.save();
+
+    // If genreIds were provided, update the article's genres
+    if (genreIds && genreIds.length > 0) {
+      const genres = await db.genres.findAll({
+        where: { id: genreIds }
+      });
+      await article.setGenres(genres); // Update genres for the article
+    }
+
+    return res.status(200).json(article);
   } catch (error) {
     console.error(error);
     return res.status(500).json({ message: 'Internal server error' });
