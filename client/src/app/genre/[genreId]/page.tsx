@@ -1,5 +1,6 @@
 "use client";
 import ArticleList from '@/components/articles/ArticleList';
+import CustomLoader from '@/components/loader/CustomLoader';
 import { useInfiniteScroll } from '@/hooks/useInfiniteScroll';
 import { getArticlesByGenre } from '@/services/newsService';
 import { Articles } from '@/types/types';
@@ -58,7 +59,7 @@ export default function GenreBasedArticlePage() {
   return (
     <>
       <ArticleList articles={articles} loading={loading}/>
-      {isFetching && hasMore && <h2 className='text-red-400 text-center m-4'>Loading more articles...</h2>}
+      {isFetching && hasMore && <CustomLoader/>}
     </>
   );
 }

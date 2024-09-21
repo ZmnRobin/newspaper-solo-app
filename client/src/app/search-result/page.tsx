@@ -6,6 +6,7 @@ import { Articles } from "@/types/types";
 import SearchResultSkeleton from "@/components/skeleton/SearchResultSkeleton";
 import SearchCard from "@/components/search/SearchCard";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
+import CustomLoader from "@/components/loader/CustomLoader";
 
 export default function SearchResult() {
   const [results, setResults] = useState<Articles[]>([]);
@@ -81,7 +82,7 @@ export default function SearchResult() {
         <SearchCard key={article.id} article={article} />
       ))}
       {isFetching && hasMore && (
-        <h2 className="text-red-400 text-center m-4">Loading more articles...</h2>
+        <CustomLoader/>
       )}
     </div>
   );

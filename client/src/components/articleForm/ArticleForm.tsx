@@ -4,6 +4,7 @@ import axiosInstance from "@/services";
 import { useRouter } from "next/navigation";
 import { backendUrl } from "@/configs/constants";
 import { getImageSrc } from "@/utils/sharedFunction";
+import toast from "react-hot-toast";
 
 interface Genre {
   id: number;
@@ -80,7 +81,7 @@ export default function ArticleForm({ article, editId }: ArticleFormProps) {
             "Content-Type": "multipart/form-data",
           },
         });
-        alert("Article updated successfully!");
+        toast.success("Article updated successfully!");
         router.push("/profile");
       } else {
         // Create new article
@@ -89,12 +90,12 @@ export default function ArticleForm({ article, editId }: ArticleFormProps) {
             "Content-Type": "multipart/form-data",
           },
         });
-        alert("Article created successfully!");
+        toast.success("Article created successfully!");
         router.push("/");
       }
     } catch (error) {
       console.error(editId ? "Error updating article" : "Error creating article", error);
-      alert("An error occurred while submitting the article");
+      toast.error("An error occurred while submitting the article");
     }
   };
 

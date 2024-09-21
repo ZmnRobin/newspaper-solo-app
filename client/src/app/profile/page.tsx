@@ -6,12 +6,39 @@ import { useUser } from "@/components/context/userContext";
 import toast from "react-hot-toast";
 import { Articles } from "@/types/types";
 import axiosInstance from "@/services";
+import { getArticlesByAuthor } from "@/services/newsService";
+import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
+import CustomLoader from "@/components/loader/CustomLoader";
 
 export default function UserProfilePage() {
   const { user } = useUser();
   const [articles, setArticles] = useState<Articles[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [page, setPage] = useState(1); 
+  const [hasMore, setHasMore] = useState(true); 
+
+  // Fetch more articles when scrolling reaches the end
+  const fetchMoreArticles = async () => {
+    if (!hasMore) return; // Stop if no more data
+    try {
+      const data = await getArticlesByAuthor(user?.id,page); // Fetch next page of articles
+      if (data?.articles?.length > 0) {
+        setArticles((prev) => [...prev, ...data?.articles]);
+        setPage((prev) => prev + 1);
+      } else {
+        setHasMore(false); // No more articles to fetch
+      }
+    } catch (err) {
+      setError("Failed to fetch more articles");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+   // Use custom infinite scroll hook to trigger fetching more articles
+   const [isFetching] = useInfiniteScroll(fetchMoreArticles);
+
 
   useEffect(() => {
     const fetchArticles = async () => {
@@ -20,9 +47,9 @@ export default function UserProfilePage() {
         return;
       }
       try {
-        const response = await axiosInstance.get(`/articles/author/${user.id}`);
-        setArticles(response.data);
-        if (response.data.length === 0) {
+        const response = await getArticlesByAuthor(user?.id,page);
+        setArticles(response?.articles);
+        if (response?.articles.length === 0) {
           toast.error("No articles found");
         }
       } catch (error) {
@@ -95,6 +122,7 @@ export default function UserProfilePage() {
     <div className="container mx-auto p-6">
       <h1 className="text-2xl font-bold mb-6">My Articles</h1>
       <MyArticle articles={articles} onDelete={handleDelete} loading={loading} />
+      {isFetching && hasMore && <CustomLoader/>}
     </div>
   );
 }
