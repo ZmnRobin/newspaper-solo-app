@@ -38,7 +38,6 @@ export default function GenreBasedArticlePage() {
 
   useEffect(() => {
     const fetchArticles = async () => {
-      setTimeout(async () => {
         try {
           setLoading(true);
           const data = await getArticlesByGenre(genreId,page);
@@ -50,7 +49,6 @@ export default function GenreBasedArticlePage() {
         } finally {
           setLoading(false);
         }
-      }, 500);
     };
 
     fetchArticles();

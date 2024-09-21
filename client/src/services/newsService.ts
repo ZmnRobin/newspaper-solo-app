@@ -3,6 +3,7 @@ import axios from "axios";
 import axiosInstance from ".";
 import { backendUrl } from "@/configs/constants";
 
+// Articles services
 export const getAllArticles = async (page: any) => {
   try {
     const response = await axios.get(
@@ -91,6 +92,15 @@ export const getAllGenres = async () => {
   }
 };
 
+export const createGenre = async (name: any) => {
+  try {
+    const response = await axiosInstance.post(`/genres`, { name });
+    return response.data;
+  } catch (error) {
+    console.error(`Error creating genre:`, error);
+    throw error;
+  }
+};
 
 // Comment services
 export const createComment = async (articleId: any, content: any) => {

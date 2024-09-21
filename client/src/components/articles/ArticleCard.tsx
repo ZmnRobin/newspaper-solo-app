@@ -52,7 +52,7 @@ export default function ArticleCard({
           {article?.User.name} -{" "}
           {convertDateFormat(article?.createdAt.toString())}
         </p>
-        <p className="text-xs text-gray-500 mb-2">
+        <p className="text-xs text-gray-500 mb-2 line-clamp-1">
           {article?.Genres?.map((genre: any) => genre.name).join(" / ")}
         </p>
         <p

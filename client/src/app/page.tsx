@@ -38,7 +38,6 @@ export default function Home() {
   useEffect(() => {
     const fetchArticles = async () => {
       setLoading(true);
-      setTimeout(async () => {
         try {
           const data = await getAllArticles(page);
           setArticles(data?.articles);
@@ -49,7 +48,6 @@ export default function Home() {
         } finally {
           setLoading(false);
         }
-      }, 500);
     };
     fetchArticles();
   }, []);

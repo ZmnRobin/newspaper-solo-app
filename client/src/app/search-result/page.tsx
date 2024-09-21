@@ -38,21 +38,20 @@ export default function SearchResult() {
   const [isFetching] = useInfiniteScroll(fetchMoreArticles);
 
   useEffect(() => {
-    if (query) {
+    const fetchArticles = async () => {
       setLoading(true);
-      setTimeout(async () => {
-        try {
-          const data = await searchArticles(query,page);
-          setResults(data?.articles);
-          setPage((prev) => prev + 1);
-          setLoading(false);
-        } catch (err) {
-          console.error("Failed to fetch articles");
-        } finally {
-          setLoading(false);
-        }
-    }, 500);
-    }
+      try {
+        const data = await searchArticles(query,page);
+        setResults(data?.articles);
+        setPage((prev) => prev + 1);
+        setLoading(false);
+      } catch (err) {
+        console.error("Failed to fetch articles");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchArticles();
   }, [query]);
 
   if (loading) {

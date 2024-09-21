@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import { backendUrl } from "@/configs/constants";
 import { getImageSrc } from "@/utils/sharedFunction";
 import toast from "react-hot-toast";
+import { FaPlus } from "react-icons/fa";
+import { createGenre } from "@/services/newsService";
 
 interface Genre {
   id: number;
@@ -16,7 +18,7 @@ interface ArticleFormProps {
     title: string;
     content: string;
     thumbnail: string;
-    Genres: Genre[]; 
+    Genres: Genre[];
   };
   editId?: string;
 }
@@ -28,12 +30,13 @@ export default function ArticleForm({ article, editId }: ArticleFormProps) {
   const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(article?.thumbnail || null);
   const [genres, setGenres] = useState<Genre[]>([]);
   const [selectedGenres, setSelectedGenres] = useState<number[]>(
-    article?.Genres ? article.Genres.map((genre) => genre.id) : [] // Initialize state with genre IDs
+    article?.Genres ? article.Genres.map((genre) => genre.id) : []
   );
+  const [isModalOpen, setIsModalOpen] = useState(false); // State for modal visibility
+  const [newGenreName, setNewGenreName] = useState(""); // State for new genre name
   const router = useRouter();
 
   useEffect(() => {
-    // Fetch genres from the backend
     const fetchGenres = async () => {
       try {
         const response = await axiosInstance.get(`${backendUrl}/genres`);
@@ -75,7 +78,6 @@ export default function ArticleForm({ article, editId }: ArticleFormProps) {
 
     try {
       if (editId) {
-        // Update article
         await axiosInstance.put(`${backendUrl}/articles/${editId}`, formData, {
           headers: {
             "Content-Type": "multipart/form-data",
@@ -84,7 +86,6 @@ export default function ArticleForm({ article, editId }: ArticleFormProps) {
         toast.success("Article updated successfully!");
         router.push("/profile");
       } else {
-        // Create new article
         await axiosInstance.post(`${backendUrl}/articles`, formData, {
           headers: {
             "Content-Type": "multipart/form-data",
@@ -99,55 +100,104 @@ export default function ArticleForm({ article, editId }: ArticleFormProps) {
     }
   };
 
+  const handleCreateGenre = async () => {
+    if (!newGenreName.trim()) return;
+
+    try {
+      const createdGenre = await createGenre(newGenreName);
+      setGenres([...genres, createdGenre]); // Update the genres state
+      setIsModalOpen(false); // Close the modal
+      setNewGenreName(""); // Reset the input
+      toast.success("Genre created successfully!");
+    } catch (error) {
+      console.error("Error creating genre:", error);
+      toast.error("Failed to create genre");
+    }
+  };
+
   return (
-    <form onSubmit={handleSubmit} className="max-w-2xl mx-auto space-y-4">
-      {/* Title */}
-      <input
-        type="text"
-        placeholder="Give a title to your article"
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
-        className="w-full text-2xl font-bold p-2 border border-gray-300 rounded"
-        required
-      />
+    <>
+      <form onSubmit={handleSubmit} className="max-w-2xl mx-auto space-y-4">
+        <input
+          type="text"
+          placeholder="Give a title to your article"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          className="w-full text-2xl font-bold p-2 border border-gray-300 rounded"
+          required
+        />
 
-      {/* Thumbnail Upload */}
-      <input type="file" accept="image/*" onChange={handleThumbnailChange} className="w-full border p-2" />
-      {/* Show the selected thumbnail if present, otherwise the existing one */}
-      {thumbnailPreview && <img src={thumbnailPreview} alt="Thumbnail preview" className="w-full mt-2" />}
-      {!thumbnail && article?.thumbnail && (
-        <img src={getImageSrc(article?.thumbnail)} alt="Existing thumbnail" className="w-full mt-2" />
+        <input type="file" accept="image/*" onChange={handleThumbnailChange} className="w-full border p-2" />
+        {thumbnailPreview && <img src={thumbnailPreview} alt="Thumbnail preview" className="w-full mt-2" />}
+        {!thumbnail && article?.thumbnail && (
+          <img src={getImageSrc(article?.thumbnail)} alt="Existing thumbnail" className="w-full mt-2" />
+        )}
+
+        <h2 className="text-lg font-bold flex justify-between">
+          Select Genres
+          <FaPlus
+            onClick={() => setIsModalOpen(true)}
+            className="ml-2 text-gray-500 cursor-pointer bg-gray-200 rounded-full p-1"
+            size={30}
+            title="Create new genre"
+          />
+        </h2>
+        <div className="flex flex-wrap gap-2">
+          {genres.map((genre) => (
+            <span
+              key={genre.id}
+              onClick={() => handleGenreToggle(genre.id)}
+              className={`cursor-pointer px-3 py-1 rounded-full text-white ${
+                selectedGenres.includes(genre.id) ? "bg-blue-500" : "bg-gray-500"
+              }`}
+            >
+              {genre.name}
+            </span>
+          ))}
+        </div>
+
+        <textarea
+          placeholder="Write your article content here . . ."
+          value={content}
+          onChange={(e) => setContent(e.target.value)}
+          className="w-full h-64 p-2 border border-gray-300 rounded"
+          required
+        ></textarea>
+
+        <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded mb-5">
+          {editId ? "Update Article" : "Create Article"}
+        </button>
+      </form>
+
+      {/* Genre Creation Modal */}
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+          <div className="bg-white p-6 rounded shadow-md w-full max-w-md">
+            <h2 className="text-xl font-bold mb-4">Create New Genre</h2>
+            <input
+              type="text"
+              placeholder="Genre name"
+              value={newGenreName}
+              onChange={(e) => setNewGenreName(e.target.value)}
+              className="w-full border p-2 rounded mb-4"
+            />
+            <div className="flex justify-end gap-2">
+              <button
+                onClick={() => {
+                  setIsModalOpen(false);
+                  setNewGenreName("");
+                }}
+                className="bg-gray-500 text-white px-4 py-2 rounded"
+              >
+                Cancel
+              </button>
+              <button onClick={handleCreateGenre} className="bg-blue-600 text-white px-4 py-2 rounded">
+                Create
+              </button>
+            </div>
+          </div>
+        </div>
       )}
-
-      {/* Genre Selection */}
-      <h2 className="text-lg font-bold">Select Genres</h2>
-      <div className="flex flex-wrap gap-2">
-        {genres.map((genre) => (
-          <span
-            key={genre.id}
-            onClick={() => handleGenreToggle(genre.id)}
-            className={`cursor-pointer px-3 py-1 rounded-full text-white ${
-              selectedGenres.includes(genre.id) ? "bg-blue-500" : "bg-gray-500"
-            }`}
-          >
-            {genre.name}
-          </span>
-        ))}
-      </div>
-
-      {/* Content */}
-      <textarea
-        placeholder="Write your article content here . . ."
-        value={content}
-        onChange={(e) => setContent(e.target.value)}
-        className="w-full h-64 p-2 border border-gray-300 rounded"
-        required
-      ></textarea>
-
-      {/* Submit Button */}
-      <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded mb-5">
-        {editId ? "Update Article" : "Create Article"}
-      </button>
-    </form>
+    </>
   );
 }
