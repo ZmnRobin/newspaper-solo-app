@@ -1,6 +1,6 @@
 "use client";
 import SingleArticle from "@/components/singleArticle/SingleArticle";
-import { getNewsById } from "@/services/newsService";
+import { getSingleArticlesById } from "@/services/newsService";
 import { useParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 
@@ -14,7 +14,7 @@ export default function ArticleDetailsPage() {
   useEffect(() => {
     const fetchNews = async () => {
       try {
-        const data = await getNewsById(article_id);
+        const data = await getSingleArticlesById(article_id);
         setArticle(data);
         setLoading(false);
       } catch (err) {

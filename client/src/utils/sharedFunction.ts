@@ -19,7 +19,6 @@ export const getImageSrc = (thumbnail: string) => {
   if (thumbnail.startsWith('http')) {
     return thumbnail;
   }
-
   // If the thumbnail is a local file (e.g., starts with '/uploads'), prepend the backend URL
   return `http://localhost:5000${thumbnail}`; // Adjust the base URL if needed
 };

@@ -3,9 +3,9 @@ import bcrypt from "bcrypt";
 import { Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import db from "../models";
-
 const User = db.users;
 
+// Signup authentication
 const signup = async (
   req: Request,
   res: Response
@@ -13,14 +13,14 @@ const signup = async (
   try {
     const { name, email, password } = req.body;
 
-    const data = {
-      name,
-      email,
-      password: await bcrypt.hash(password, 10),
-    };
+    // Check if the user already exists
+    const existingUser = await User.findOne({ where: { email } });
+    if (existingUser) {
+      return res.status(409).json({ message: "Email is already registered" });
+    }
 
-    // Saving the user
-    const user = await User.create(data);
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const user = await User.create({ name, email, password: hashedPassword });
 
     if (user) {
       const token = jwt.sign(
@@ -34,19 +34,24 @@ const signup = async (
       res.cookie("jwt", token, {
         maxAge: 1 * 24 * 60 * 60 * 1000,
         httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
       });
 
-      console.log("user", JSON.stringify(user, null, 2));
-      console.log(token);
-
       // Send user details
-      return res.status(201).send(user);
+      return res.status(201).json({
+        user: {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+        },
+        token,
+      });
     } else {
-      return res.status(409).send("Details are not correct");
+      return res.status(409).json({ message: "Invalid user details" });
     }
   } catch (error) {
     console.error(error);
-    return res.status(500).send("Internal server error");
+    return res.status(500).json({ message: "Internal server error" });
   }
 };
 
@@ -74,7 +79,7 @@ const login = async (req: Request, res: Response): Promise<Response> => {
           }
         );
 
-        // Still set the HTTP-only cookie for additional security
+        // Set the HTTP-only cookie for additional security
         res.cookie("jwt", token, {
           maxAge: 1 * 24 * 60 * 60 * 1000,
           httpOnly: true,
@@ -82,28 +87,24 @@ const login = async (req: Request, res: Response): Promise<Response> => {
           secure: process.env.NODE_ENV === "production",
         });
 
-        console.log("user", JSON.stringify(user, null, 2));
-        console.log(token);
-
         // Send user data and token in the response
         return res.status(200).json({
           user: {
             id: user.id,
             name: user.name,
             email: user.email,
-            // Add any other non-sensitive user data you want to include
           },
           token,
         });
       } else {
-        return res.status(401).send("Authentication failed");
+        return res.status(401).json({ message: "Invalid password" });
       }
     } else {
-      return res.status(401).send("Authentication failed");
+      return res.status(401).json({ message: "User not found" });
     }
   } catch (error) {
     console.error(error);
-    return res.status(500).send("Internal server error");
+    return res.status(500).json({ message: "Internal server error" });
   }
 };
 

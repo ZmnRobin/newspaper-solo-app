@@ -15,11 +15,5 @@
 } */
 
 body {
-  font-family: "Noto Serif JP, serif";
+  font-family: "Helvetica", sans-serif;
 }
-
-/* @layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
-}  */

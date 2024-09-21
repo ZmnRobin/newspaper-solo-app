@@ -3,6 +3,7 @@ import "./globals.css";
 import Navbar from "@/components/common/Navbar";
 import Footer from "@/components/common/Footer";
 import { UserProvider } from "@/components/context/userContext";
+import { Toaster } from "react-hot-toast";
 
 export const metadata: Metadata = {
   title: "The Newspaper App",
@@ -17,11 +18,14 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-       <UserProvider>
+        <UserProvider>
           <div className="border bottom-2">
             <Navbar />
           </div>
-          <div className="container mx-auto">{children}</div>
+          <div className="container mx-auto">
+            <Toaster />
+            {children}
+          </div>
           <Footer />
         </UserProvider>
       </body>

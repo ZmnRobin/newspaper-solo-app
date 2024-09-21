@@ -3,7 +3,7 @@ import { convertDateFormat } from "@/utils/sharedFunction";
 import { FaEdit, FaTrash, FaCheck, FaTimes } from "react-icons/fa";
 import Cookies from "js-cookie";
 import Modal from "../common/Modal";
-import { Comment } from "@/configs/types";
+import { Comment } from "@/types/types";
 
 interface CommentListProps {
   comments: Comment[];

@@ -1,7 +1,7 @@
 import React from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Articles } from "@/configs/types";
+import { Articles } from "@/types/types";
 import { getImageSrc, convertDateFormat } from "@/utils/sharedFunction";
 
 interface RelatedArticlesProps {

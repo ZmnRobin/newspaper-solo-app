@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Articles, Comment } from "@/configs/types";
+import { Articles, Comment } from "@/types/types";
 import { createComment, deleteCommentById, getCommentsByArticle, getRelatedArticles, updateCommentById } from "@/services/newsService";
 import CommentList from "./CommentList";
 import CommentForm from "./CommentForm";
@@ -22,7 +22,7 @@ export default function SingleArticle({ article }: SingleArticleProps) {
 
   const fetchRelatedArticles = async () => {
     const data = await getRelatedArticles(article.id);
-    setRelatedArticles(data);
+    setRelatedArticles(data?.articles);
   };
 
   useEffect(() => {

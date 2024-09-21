@@ -2,13 +2,9 @@
 import express from "express";
 import {
   createArticle,
-  getAllArticles,
+  getArticles,
   getSingleArticle,
   deleteArticle,
-  getArticlesByGenre,
-  getRelatedArticles,
-  getArticlesByAuthor,
-  searchArticles,
   updateArticle,
 } from "../controllers/articleController";
 import verifyToken from "../middlewares/authMiddleware";
@@ -23,17 +19,8 @@ import { Multer } from "multer";
 export default function (upload: Multer) {
   const router = express.Router();
 
-  // Ger articles based on search query
-  router.get("/search", searchArticles);
-
-  // Get all articles
-  router.get("/", getAllArticles);
-
-  // Get article based on author
-  router.get("/author/:authorId", verifyToken, getArticlesByAuthor);
-
-  // Get article based on genre
-  router.get("/genre/:genreId", getArticlesByGenre);
+  // Get articles (handles search, by genre, by author, related articles)
+  router.get("/", getArticles);
 
   // Get a single article by ID
   router.get("/:id", getSingleArticle);
@@ -47,19 +34,10 @@ export default function (upload: Multer) {
   // Delete an article (protected route)
   router.delete("/:id", verifyToken, deleteArticle);
 
-  // Get related articles
-  router.get("/:articleId/related", getRelatedArticles);
-
-  // Create a new comment (protected route)
+  // Comment routes (keep as they are)
   router.post("/:articleId/comments", verifyToken, createComment);
-
-  // Get all comments for a specific article
   router.get("/:articleId/comments", getCommentsByArticle);
-  
-  // Delete a comment by it's owner (protected route)
   router.delete("/:articleId/comments/:commentId", verifyToken, deleteComment);
-
-  // Update a comment by it's owner (protected route)
   router.put("/:articleId/comments/:commentId", verifyToken, updateComment);
 
   return router;

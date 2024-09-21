@@ -1,4 +1,4 @@
-export interface User {
+export type User ={
     id: number;
     name:string;
     email: string;
@@ -7,11 +7,12 @@ export interface User {
     createdAt: Date;
     updatedAt: Date;
 }
-export interface Genre {
+
+export type Genre ={
     id: number;
     name: string;
 };
-export interface Articles {
+export type Articles = {
     id: number;
     title: string;
     content: string;
@@ -23,7 +24,7 @@ export interface Articles {
     User: User;
     Genres: Genre[];
 }
-export interface Comment {
+export type Comment = {
     id: number;
     content: string;
     User: User;

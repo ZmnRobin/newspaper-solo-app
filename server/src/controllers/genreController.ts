@@ -24,7 +24,6 @@ export const createGenre = async (req: Request, res: Response): Promise<Response
     if (existingGenre) {
       return res.status(400).json({ message: 'Genre already exists' });
     }
-
     // Create the new genre
     const newGenre = await Genre.create({ name });
     return res.status(201).json(newGenre);
@@ -43,7 +42,6 @@ export const deleteGenre = async (req: Request, res: Response): Promise<Response
     if (!genre) {
       return res.status(404).json({ message: 'Genre not found' });
     }
-
     await genre.destroy();
     return res.status(204).json({ message: 'Genre deleted successfully' });
   } catch (error) {

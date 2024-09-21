@@ -2,7 +2,7 @@
 "use client";
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import Cookies from 'js-cookie';
-import { User } from '@/configs/types';
+import { User } from '@/types/types';
 import { useRouter } from 'next/navigation';
 
 

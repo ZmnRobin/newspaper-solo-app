@@ -1,8 +1,10 @@
 "use client";
 import React, { useState } from 'react';
+import axios from 'axios';
 import { useRouter } from 'next/navigation';
-import { signUp } from '@/services/authService';
+import toast from 'react-hot-toast';
 import Link from 'next/link';
+import { backendUrl } from '@/configs/constants';
 
 const SignUp: React.FC = () => {
   const [name, setName] = useState('');
@@ -14,10 +16,35 @@ const SignUp: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await signUp(name, email, password);
+      const response = await axios.post(`${backendUrl}/users/signup`, {
+        name,
+        email,
+        password,
+      });
+
+      toast.success('Account created successfully');
       router.push('/login');
+      
     } catch (err) {
-      setError('Failed to sign up. Please try again.');
+      console.error(err);
+
+      if (axios.isAxiosError(err) && err.response) {
+        // Handle different error scenarios
+        if (err.response.status === 409) {
+          setError('The email or username is already registered. Please use a different email or name.');
+          toast.error('The email or username is already registered. Please use a different email or name.');
+        } else if (err.response.status === 500) {
+          setError('Internal server error. Please try again later.');
+          toast.error('Internal server error. Please try again later.');
+        } else {
+          setError('An unexpected error occurred. Please try again.');
+          toast.error('An unexpected error occurred. Please try again.');
+        }
+      } else {
+        // Network or other errors
+        setError('Network error. Please check your connection and try again.');
+        toast.error('Network error. Please check your connection and try again.');
+      }
     }
   };
 

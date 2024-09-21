@@ -1,18 +1,62 @@
-import { Articles } from "@/configs/types";
 import React from "react";
 import ArticleCard from "./ArticleCard";
+import Skeleton from "../skeleton/Skeleton";
+import { Articles } from "@/types/types";
 
 interface ArticleListProps {
   articles: Articles[];
+  loading: boolean;
 }
 
-export default function ArticleList({ articles }: ArticleListProps) {
+export default function ArticleList({ articles,loading }: ArticleListProps) {
+  if (loading) {
+    return (
+      <div className="m-5 space-y-6">
+        <div className="grid gap-6 grid-cols-5">
+          <div className="col-span-6 md:col-span-1">
+            <Skeleton type="image" className="h-48 w-full" />
+            <Skeleton type="title" className="mt-4" />
+            <Skeleton type="text" count={2} className="mt-2" />
+          </div>
+          <div className="col-span-6 md:col-span-3 row-span-2 px-3 border-r-1">
+            <Skeleton type="image" className="h-96 w-full" />
+            <Skeleton type="title" className="mt-4 h-10" />
+            <Skeleton type="text" count={4} className="mt-2" />
+          </div>
+          <div className="col-span-6 md:col-span-1">
+            <Skeleton type="image" className="h-48 w-full" />
+            <Skeleton type="title" className="mt-4" />
+            <Skeleton type="text" count={2} className="mt-2" />
+          </div>
+          <div className="col-span-6 md:col-span-1">
+            <Skeleton type="image" className="h-48 w-full" />
+            <Skeleton type="title" className="mt-4" />
+            <Skeleton type="text" count={2} className="mt-2" />
+          </div>
+          <div className="col-span-6 md:col-span-1">
+            <Skeleton type="image" className="h-48 w-full" />
+            <Skeleton type="title" className="mt-4" />
+            <Skeleton type="text" count={2} className="mt-2" />
+          </div>
+        </div>
+        <div className="grid gap-6 grid-cols-4 auto-rows-auto">
+          {[...Array(8)].map((_, index) => (
+            <div key={index} className="col-span-6 md:col-span-3 lg:col-span-1 p-2">
+              <Skeleton type="image" className="h-48 w-full" />
+              <Skeleton type="title" className="mt-4" />
+              <Skeleton type="text" count={2} className="mt-2" />
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
   if (articles.length === 0) {
-    return <div className="text-3xl m-4 text-center">No article found.</div>;
+    return <div className="text-2xl m-4">No article found.</div>;
   }
 
   const [secondFeature,thirdFeature,featured, fourthFeature, fifthFeature, ...restArticles] = articles;
-
+  
   return (
     <div className="m-5 space-y-6">
       {/* Upper Section: Two medium features on the left and right, featured article in the center */}

@@ -1,6 +1,6 @@
 import React from "react";
 import Link from "next/link";
-import { Articles } from "@/configs/types";
+import { Articles } from "@/types/types";
 import Image from "next/image";
 import { convertDateFormat, getImageSrc } from "@/utils/sharedFunction";
 

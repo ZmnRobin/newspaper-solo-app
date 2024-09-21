@@ -67,7 +67,7 @@ export default function Navbar() {
       <div>
         <div className="flex justify-center items-center py-2 px-4">
           <div className="flex space-x-4 m-1">
-            {categories.map((category:any, index:number) => (
+            {categories.map((category: any, index: number) => (
               <Link
                 key={index}
                 href={`/genre/${category.id}`}
@@ -85,14 +85,14 @@ export default function Navbar() {
         </div>
         {showSearch && (
           <div className="flex justify-center w-full bg-white m-2 px-10">
-              <input
-                type="text"
-                placeholder="Search articles here ..."
-                className="w-9/12 p-2 text-sm border border-gray-800 focus:ring-0"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                onKeyDown={handleSearch} 
-              />
+            <input
+              type="text"
+              placeholder="Search articles here ..."
+              className="w-9/12 p-2 text-sm border border-gray-800 focus:ring-0"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              onKeyDown={handleSearch}
+            />
             <button
               className="text-4xl ml-4"
               onClick={() => setShowSearch(false)}
