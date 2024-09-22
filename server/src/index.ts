@@ -9,6 +9,8 @@ import genreRoute from "./routes/genreRoute";
 import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
+import elasticClient from "./config/elasticsearch";
+import { syncAllArticles } from "./services/articleService";
 
 dotenv.config();
 
@@ -52,6 +54,31 @@ const upload = multer({
     }
   }
 });
+
+// Initialize Elasticsearch index
+const initializeElasticIndex = async () => {
+  const indexExists = await elasticClient.indices.exists({ index: 'articles' });
+  if (!indexExists) {
+    await elasticClient.indices.create({
+      index: 'articles',
+      body: {
+        mappings: {
+          properties: {
+            title: { type: 'text' },
+            content: { type: 'text' },
+            author_id: { type: 'integer' },
+            published_at: { type: 'date' },
+          },
+        },
+      },
+    });
+
+    // Sync existing articles to Elasticsearch
+    await syncAllArticles();
+  }
+};
+
+initializeElasticIndex();
 
 // Serve static files from the uploads directory
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));

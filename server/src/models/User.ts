@@ -58,5 +58,5 @@ const initUserModel = (sequelize: Sequelize) => {
   return User;
 };
 
-
+export { User, initUserModel };
 export default initUserModel;

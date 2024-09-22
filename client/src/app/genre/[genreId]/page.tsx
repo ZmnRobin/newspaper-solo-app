@@ -6,6 +6,7 @@ import { getArticlesByGenre } from '@/services/newsService';
 import { Articles } from '@/types/types';
 import { useParams } from 'next/navigation';
 import React, { useEffect, useState } from 'react'
+import toast from 'react-hot-toast';
 
 export default function GenreBasedArticlePage() { 
   const [articles, setArticles] = useState<Articles[]>([]);
@@ -29,6 +30,7 @@ export default function GenreBasedArticlePage() {
       }
     } catch (err) {
       setError("Failed to fetch more articles");
+      toast.error("Failed to fetch more articles");
     } finally {
       setLoading(false);
     }

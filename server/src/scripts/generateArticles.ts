@@ -46,4 +46,4 @@ const generateFakeArticles = async (numArticles: number) => {
 };
 
 // Call the function to generate 50 fake articles
-generateFakeArticles(100000);
+generateFakeArticles(200000);

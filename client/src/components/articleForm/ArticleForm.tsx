@@ -43,6 +43,7 @@ export default function ArticleForm({ article, editId }: ArticleFormProps) {
         setGenres(response.data);
       } catch (error) {
         console.error("Error fetching genres:", error);
+        toast.error("Failed to fetch genres");
       }
     };
     fetchGenres();

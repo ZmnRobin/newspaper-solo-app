@@ -16,7 +16,7 @@ export default function Navbar() {
   const [showMoreDropdown, setShowMoreDropdown] = useState(false);
   const router = useRouter();
 
-  const MAX_VISIBLE_GENRES = 15;
+  const MAX_VISIBLE_GENRES = 12;
 
   const toggleSearch = () => {
     setShowSearch(!showSearch);

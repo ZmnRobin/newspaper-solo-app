@@ -6,6 +6,8 @@ import CommentForm from "./CommentForm";
 import RelatedArticles from "./RelatedArticles";
 import Image from "next/image";
 import { convertDateFormat, getImageSrc } from "@/utils/sharedFunction";
+import toast from "react-hot-toast";
+import RelatedArticleSkeleton from "../skeleton/RelatedArticleSkeleton";
 
 interface SingleArticleProps {
   article: Articles;
@@ -14,6 +16,7 @@ interface SingleArticleProps {
 export default function SingleArticle({ article }: SingleArticleProps) {
   const [comments, setComments] = useState<Comment[]>([]);
   const [relatedArticles, setRelatedArticles] = useState<Articles[]>([]);
+  const [loading, setLoading] = useState(false);
 
   const fetchComments = async () => {
     const data = await getCommentsByArticle(article.id);
@@ -21,8 +24,17 @@ export default function SingleArticle({ article }: SingleArticleProps) {
   };
 
   const fetchRelatedArticles = async () => {
-    const data = await getRelatedArticles(article.id);
-    setRelatedArticles(data?.articles);
+    try {
+      setLoading(true);
+      const data = await getRelatedArticles(article.id);
+      setRelatedArticles(data?.articles);
+      setLoading(false);
+    }
+    catch (err) {
+      console.log(err);
+      toast.error("Failed to fetch related articles");
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -32,20 +44,36 @@ export default function SingleArticle({ article }: SingleArticleProps) {
 
   // Pass both commentId and articleId for delete and update
   const handleCreateComment = async (content: string) => {
-    await createComment(article.id, content);
-    fetchComments(); // Update UI
+    try {
+      await createComment(article.id, content);
+      fetchComments(); // Update UI
+    }
+    catch (err) {
+      console.log(err);
+      toast.error("Failed to create comment");
+    }
   };
 
   const handleDeleteComment = async (commentId: number) => {
-    await deleteCommentById(article.id, commentId);  // Pass articleId alongside commentId
-    setComments((prev) => prev.filter((comment) => comment.id !== commentId)); // Update state locally
+    try {
+      await deleteCommentById(article.id, commentId); // Pass articleId alongside commentId
+      setComments((prev) => prev.filter((comment) => comment.id !== commentId)); // Update state locally
+    }
+    catch (err) {
+      console.log(err);
+      toast.error("Failed to delete comment");
+    }
   };
 
   const handleUpdateComment = async (commentId: number, content: string) => {
-    await updateCommentById(article.id, commentId, content); // Pass articleId alongside commentId
-    setComments((prev) =>
-      prev.map((comment) => (comment.id === commentId ? { ...comment, content } : comment))
-    ); // Update state locally
+    try {
+      await updateCommentById(article.id, commentId, content); // Pass articleId alongside commentId
+      fetchComments(); // Update UI
+    }
+    catch (err) {
+      console.log(err);
+      toast.error("Failed to update comment");
+    }
   };
 
   return (
@@ -92,8 +120,11 @@ export default function SingleArticle({ article }: SingleArticleProps) {
           />
         </div>
 
-        {/* Right column - Related articles */}
-        <RelatedArticles articles={relatedArticles} />
+        {loading ? ( 
+          <RelatedArticleSkeleton/>
+        ) : (
+          <RelatedArticles articles={relatedArticles} />
+        )}
       </div>
     </div>
   );

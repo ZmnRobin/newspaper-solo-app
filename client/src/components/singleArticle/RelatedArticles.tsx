@@ -8,6 +8,7 @@ interface RelatedArticlesProps {
   articles: Articles[];
 }
 
+
 export default function RelatedArticles({ articles }: RelatedArticlesProps) {
   return (
     <div className="lg:col-span-3">
@@ -37,6 +38,7 @@ export default function RelatedArticles({ articles }: RelatedArticlesProps) {
             </div>
           ))}
         </div>
+        {articles.length === 0 && <div className="m-5 text-center text-red-400">No related articles</div>}
       </div>
     </div>
   );
