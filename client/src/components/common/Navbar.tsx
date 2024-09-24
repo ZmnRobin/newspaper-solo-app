@@ -2,18 +2,21 @@
 import { useEffect, useState } from "react";
 import { formatedDate } from "@/utils/sharedFunction";
 import Link from "next/link";
-import { FaSearch } from "react-icons/fa";
-import { useRouter } from "next/navigation";
+import { FaSearch, FaCaretDown } from "react-icons/fa";
+import { usePathname, useRouter } from "next/navigation";
 import { getAllGenres } from "@/services/newsService";
 import { useUser } from "../context/userContext";
 import { Genre } from "@/types/types";
 
 export default function Navbar() {
   const { user, logout } = useUser();
+  const pathname = usePathname();
   const [showSearch, setShowSearch] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [categories, setCategories] = useState<Genre[]>([]);
   const [showMoreDropdown, setShowMoreDropdown] = useState(false);
+  const [activeNavItem, setActiveNavItem] = useState<string | null>(null);
+  const [selectedMoreLabel, setSelectedMoreLabel] = useState<string | null>(null);
   const router = useRouter();
 
   const MAX_VISIBLE_GENRES = 12;
@@ -22,7 +25,7 @@ export default function Navbar() {
     setShowSearch(!showSearch);
   };
 
-  const handleSearch = (e: { key: string; }) => {
+  const handleSearch = (e: { key: string }) => {
     if (e.key === "Enter" && searchTerm.trim()) {
       router.push(`/search-result?query=${encodeURIComponent(searchTerm)}`);
     }
@@ -33,6 +36,15 @@ export default function Navbar() {
       setCategories(data);
     });
   }, []);
+
+  useEffect(() => {
+    const genrePathMatch = pathname.match(/^\/genre\/(\d+)$/);
+    if (genrePathMatch) {
+      setActiveNavItem(genrePathMatch[1]);
+    } else {
+      setActiveNavItem(null);
+    }
+  }, [pathname]);
 
   const visibleCategories = categories.slice(0, MAX_VISIBLE_GENRES);
   const hiddenCategories = categories.slice(MAX_VISIBLE_GENRES);
@@ -72,30 +84,53 @@ export default function Navbar() {
       <div>
         <div className="flex justify-center items-center py-2 px-4 relative">
           <div className="flex space-x-4 m-1">
-            {visibleCategories.map((category, index) => (
+            {visibleCategories.map((category) => (
               <Link
-                key={index}
+                key={category.id}
                 href={`/genre/${category.id}`}
-                className="text-gray-700 hover:text-gray-900"
+                className={`text-gray-700 hover:text-gray-900 ${
+                  activeNavItem === category.id.toString()
+                    ? "font-bold text-blue-600 border-b-2 border-blue-600"
+                    : ""
+                }`}
+                onClick={() => {
+                  setActiveNavItem(category.id.toString());
+                  setSelectedMoreLabel(null); // Reset the dropdown label
+                }}
               >
                 {category.name}
               </Link>
             ))}
             {hiddenCategories.length > 0 && (
-              <div className="relative">
+              <div
+                className="relative"
+                onMouseEnter={() => setShowMoreDropdown(true)}
+                onMouseLeave={() => setShowMoreDropdown(false)}
+              >
                 <button
-                  onClick={() => setShowMoreDropdown(!showMoreDropdown)}
-                  className="text-gray-700 hover:text-gray-900"
+                  className={`flex items-center text-gray-700 hover:text-gray-900 ${
+                    selectedMoreLabel ? "underline font-bold text-blue-600" : ""
+                  }`}
                 >
-                  More
+                  {selectedMoreLabel || "More"}
+                  <FaCaretDown className="ml-1" />
                 </button>
                 {showMoreDropdown && (
                   <div className="absolute top-full left-0 bg-white border border-gray-200 rounded shadow-lg z-10">
-                    {hiddenCategories.map((category, index) => (
+                    {hiddenCategories.map((category) => (
                       <Link
-                        key={index}
+                        key={category.id}
                         href={`/genre/${category.id}`}
-                        className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+                        className={`block px-4 py-2 text-gray-700 hover:bg-gray-100 ${
+                          activeNavItem === category.id.toString()
+                            ? "font-bold text-blue-600 bg-gray-100 underline" // Underline the selected item in the dropdown
+                            : ""
+                        }`}
+                        onClick={() => {
+                          setActiveNavItem(category.id.toString());
+                          setSelectedMoreLabel(category.name); // Set the dropdown label to selected item
+                          setShowMoreDropdown(false); // Close the dropdown
+                        }}
                       >
                         {category.name}
                       </Link>

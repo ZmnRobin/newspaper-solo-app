@@ -76,12 +76,12 @@ export default function UserProfilePage() {
   
     fetchArticles();
   }, [user]);
-  
+
   const handleDelete = async (articleId: number) => {
     try {
       await axiosInstance.delete(`/articles/${articleId}`);
       setArticles((prevArticles) =>
-        prevArticles.filter((article) => article.id !== articleId)
+        prevArticles.filter((article) => article.id !== articleId) // Check if both are numbers
       );
       toast.success("Article deleted successfully!");
     } catch (error) {
@@ -102,6 +102,7 @@ export default function UserProfilePage() {
       }
     }
   };
+  
   
   if (error) {
     return (

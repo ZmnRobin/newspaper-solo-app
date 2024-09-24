@@ -5,18 +5,20 @@ import Cookies from 'js-cookie';
 import { User } from '@/types/types';
 import { useRouter } from 'next/navigation';
 
-
 interface UserContextType {
   user: User | null;
   setUser: (user: User | null) => void;
   logout: () => void;
+  activeNavItem: string | null;
+  setActiveNavItem: (navItemId: string) => void;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
 export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
-  const router=useRouter();
+  const [activeNavItem, setActiveNavItem] = useState<string | null>(null);
+  const router = useRouter();
 
   useEffect(() => {
     const userFromCookie = Cookies.get('user');
@@ -33,7 +35,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   return (
-    <UserContext.Provider value={{ user, setUser, logout }}>
+    <UserContext.Provider value={{ user, setUser, logout, activeNavItem, setActiveNavItem }}>
       {children}
     </UserContext.Provider>
   );

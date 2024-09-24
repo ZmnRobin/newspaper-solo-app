@@ -11,11 +11,24 @@ import path from 'path';
 import fs from 'fs';
 import elasticClient from "./config/elasticsearch";
 import { syncAllArticles } from "./services/articleService";
+import { createServer } from 'http'; // Import createServer from http
+import { Server } from 'socket.io';
 
 dotenv.config();
 
 const app: Express = express();
 const port = process.env.PORT || 5000;
+
+// Create HTTP server
+const httpServer = createServer(app);
+
+// Initialize Socket.io
+const io = new Server(httpServer, {
+  cors: {
+    origin: "*", // Replace '*' with your frontend URL in production for security
+    methods: ["GET", "POST"]
+  }
+});
 
 // Middleware
 app.use(cors());
@@ -32,16 +45,16 @@ if (!fs.existsSync(uploadsDir)) {
 // Set up multer for file uploads
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, 'src/uploads/'); // Define where to store files
+    cb(null, 'src/uploads/');
   },
   filename: (req, file, cb) => {
-    cb(null, Date.now() + path.extname(file.originalname)); // Use timestamp for filenames
+    cb(null, Date.now() + path.extname(file.originalname));
   }
 });
 
 const upload = multer({
   storage: storage,
-  limits: { fileSize: 1000000 }, // Limit file size to 1MB
+  limits: { fileSize: 1000000 },
   fileFilter: (req, file, cb) => {
     const filetypes = /jpeg|jpg|png|gif/;
     const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
@@ -67,7 +80,10 @@ const initializeElasticIndex = async () => {
             title: { type: 'text' },
             content: { type: 'text' },
             author_id: { type: 'integer' },
-            published_at: { type: 'date' },
+            thumbnail: { type: 'keyword' },
+            createdAt: { type: 'date' },
+            updatedAt: { type: 'date' },
+            genres: { type: 'integer' },
           },
         },
       },
@@ -98,7 +114,21 @@ app.use('/api/users', userRoutes);
 app.use('/api/articles', articleRoutes(upload)); // Ensure article routes use multer for file upload
 app.use('/api/genres', genreRoute);
 
-// Listen on the server port
-app.listen(port, () => {
+// Socket.io connection event
+io.on('connection', (socket) => {
+  console.log('A user connected:', socket.id);
+
+  socket.on('disconnect', () => {
+    console.log('User disconnected:', socket.id);
+  });
+});
+
+// Function to emit article indexing completion
+export const emitArticleIndexed = (article: any) => {
+  io.emit('articleIndexed', article);
+};
+
+// Start the server with httpServer instead of app.listen
+httpServer.listen(port, () => {
   console.log(`[server]: Server is running at http://localhost:${port}`);
 });

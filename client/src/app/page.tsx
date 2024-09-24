@@ -5,6 +5,7 @@ import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import { getAllArticles } from "@/services/newsService";
 import { Articles } from "@/types/types";
 import { useEffect, useState } from "react";
+import { io } from "socket.io-client";
 
 export default function Home() {
   const [articles, setArticles] = useState<Articles[]>([]);
@@ -12,6 +13,20 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [hasMore, setHasMore] = useState(true); 
+
+    // Initialize the Socket.io client
+    useEffect(() => {
+      const socket = io("http://localhost:5000");
+  
+      // Listen for the 'articleIndexed' event
+      socket.on('articleIndexed', (newArticle) => {
+        setArticles((prevArticles) => [newArticle, ...prevArticles]);
+      });
+  
+      return () => {
+        socket.disconnect();
+      };
+    }, []);
 
   // Fetch more articles when scrolling reaches the end
   const fetchMoreArticles = async () => {

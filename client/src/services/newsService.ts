@@ -49,7 +49,7 @@ export const getArticlesByGenre = async (genreId: any,page:any) => {
 export const getRelatedArticles = async (articleId: any) => {
   try {
     const response = await axios.get(
-      `${backendUrl}/articles?articleId=${articleId}&limit=6`
+      `${backendUrl}/articles?articleId=${articleId}&limit=5`
     );
     return response.data;
   } catch (error) {

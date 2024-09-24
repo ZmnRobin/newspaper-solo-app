@@ -49,7 +49,7 @@ export default function ArticleCard({
           </h1>
         </Link>
         <p className="text-xs text-gray-500 mb-2">
-          {article?.User.name} -{" "}
+          {article?.User?.name} -{" "}
           {convertDateFormat(article?.createdAt.toString())}
         </p>
         <p className="text-xs text-gray-500 mb-2 line-clamp-1">

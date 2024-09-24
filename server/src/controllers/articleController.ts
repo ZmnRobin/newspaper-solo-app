@@ -3,6 +3,7 @@ import { Request, Response } from 'express';
 import db from '../models';
 import { Op } from 'sequelize';
 import elasticClient from '../config/elasticsearch';
+import { emitArticleIndexed } from '..';
 
 const Article = db.articles;
 const User = db.users;
@@ -12,179 +13,31 @@ interface AuthRequest extends Request {
     user?: any;
 }
 
-// export const getArticles = async (req: Request, res: Response): Promise<Response> => {
-//   const { page = 1, limit = 10, genreId, authorId, query, articleId } = req.query;
-//   const pageNumber = parseInt(page as string, 10);
-//   const limitNumber = parseInt(limit as string, 10);
-//   const from = (pageNumber - 1) * limitNumber;
+// Helper function to index an article in Elasticsearch
+async function indexArticleInElasticsearch(article: any, genreIds: number[]) {
+  try {
+    await elasticClient.index({
+      index: 'articles',
+      id: article.id.toString(),
+      body: {
+        title: article.title,
+        content: article.content,
+        author_id: article.author_id,
+        thumbnail: article.thumbnail,
+        genres: genreIds || [],
+        createdAt: article.createdAt,
+        updatedAt: article.updatedAt,
+      },
+    });
+    console.log(`Article ${article.id} indexed in Elasticsearch`);
 
-//   try {
-//     // Use Elasticsearch for search queries
-//     if (query) {
-//       const response = await esClient.search({
-//         index: 'articles',
-//         body: {
-//           from,
-//           size: limitNumber,
-//           query: {
-//             multi_match: {
-//               query: query as string,
-//               fields: ['title', 'content', 'author.name', 'genres.name']
-//             }
-//           },
-//           sort: [{ createdAt: 'desc' }]
-//         }
-//       });
+    // Emit the article indexed event
+    emitArticleIndexed(article);
 
-//       const hits = response.hits.hits;
-//       const total = response.hits.total ? response.hits.total.valueOf as unknown as number : 0;
-
-//       const articles = hits.map((hit: any) => ({
-//         id: hit._id,
-//         ...hit._source
-//       }));
-
-//       return res.status(200).json({
-//         articles,
-//         currentPage: pageNumber,
-//         totalPages: Math.ceil(total / limitNumber),
-//         totalItems: total,
-//       });
-//     }
-
-//     // For non-search queries, use the existing Sequelize logic
-//     let whereClause: any = {};
-//     let includeClause: any = [
-//       { model: User, attributes: ['id', 'name'] },
-//       Genre
-//     ];
-
-//     if (genreId) {
-//       includeClause = [
-//         {
-//           model: Genre,
-//           where: { id: genreId },
-//           through: { attributes: [] },
-//         },
-//         {
-//           model: User,
-//           attributes: ['id', 'name'],
-//         }
-//       ];
-//     }
-
-//     if (authorId) {
-//       whereClause.author_id = authorId;
-//     }
-
-//     if (articleId) {
-//       whereClause.id = { [Op.ne]: articleId };
-//       const currentArticle = await Article.findByPk(articleId, {
-//         include: [{ model: Genre }]
-//       });
-//       if (!currentArticle) {
-//         return res.status(404).json({ message: 'Article not found' });
-//       }
-//       const genreIds = currentArticle.Genres.map((genre: { id: any; }) => genre.id);
-//       includeClause[0].where = { id: { [Op.in]: genreIds } };
-//     }
-
-//     const { count, rows: articles } = await Article.findAndCountAll({
-//       where: whereClause,
-//       include: includeClause,
-//       order: [['createdAt', 'DESC']],
-//       limit: limitNumber,
-//       offset: from,
-//       distinct: true,
-//     });
-
-//     const totalPages = Math.ceil(count / limitNumber);
-
-//     return res.status(200).json({
-//       articles,
-//       currentPage: pageNumber,
-//       totalPages,
-//       totalItems: count,
-//     });
-//   } catch (error) {
-//     console.error(error);
-//     return res.status(500).json({ message: 'Internal server error' });
-//   }
-// };
-
-// export const getArticles = async (req: Request, res: Response): Promise<Response> => {
-//   const { page = 1, limit = 10, genreId, authorId, query, articleId } = req.query;
-//   const pageNumber = parseInt(page as string, 10);
-//   const limitNumber = parseInt(limit as string, 10);
-//   const offset = (pageNumber - 1) * limitNumber;
-
-//   try {
-//     let whereClause: any = {};
-//     let includeClause: any = [
-//       { model: User, attributes: ['id', 'name'] },
-//       Genre
-//     ];
-
-//     if (genreId) {
-//       includeClause = [
-//         {
-//           model: Genre,
-//           where: { id: genreId },
-//           through: { attributes: [] },
-//         },
-//         {
-//           model: User,
-//           attributes: ['id', 'name'],
-//         }
-//       ];
-//     }
-
-//     if (authorId) {
-//       whereClause.author_id = authorId;
-//     }
-
-//     if (query) {
-//       whereClause[Op.or] = [
-//         { title: { [Op.iLike]: `%${query}%` } },
-//         { content: { [Op.iLike]: `%${query}%` } }
-//       ];
-//     }
-
-//     if (articleId) {
-//       whereClause.id = { [Op.ne]: articleId };
-//       const currentArticle = await Article.findByPk(articleId, {
-//         include: [{ model: Genre }]
-//       });
-//       if (!currentArticle) {
-//         return res.status(404).json({ message: 'Article not found' });
-//       }
-//       const genreIds = currentArticle.Genres.map((genre: { id: any; }) => genre.id);
-//       includeClause[0].where = { id: { [Op.in]: genreIds } };
-//     }
-
-//     const { count, rows: articles } = await Article.findAndCountAll({
-//       where: whereClause,
-//       include: includeClause,
-//       order: [['createdAt', 'DESC']],
-//       limit: limitNumber,
-//       offset,
-//       distinct: true,
-//     });
-
-//     const totalPages = Math.ceil(count / limitNumber);
-
-//     return res.status(200).json({
-//       articles,
-//       currentPage: pageNumber,
-//       totalPages,
-//       totalItems: count,
-//     });
-//   } catch (error) {
-//     console.error(error);
-//     return res.status(500).json({ message: 'Internal server error' });
-//   }
-// };
-
+  } catch (error) {
+    console.error(`Failed to index article ${article.id} in Elasticsearch:`, error);
+  }
+}
 
 export const getArticles = async (req: Request, res: Response): Promise<Response> => {
   const { page = 1, limit = 10, genreId, authorId, query, articleId } = req.query;
@@ -193,113 +46,100 @@ export const getArticles = async (req: Request, res: Response): Promise<Response
   const offset = (pageNumber - 1) * limitNumber;
 
   try {
-    let whereClause: any = {};
-    let includeClause: any = [
-      { model: User, attributes: ['id', 'name'] },
-      Genre
-    ];
-
-    // Handle genre filter
-    if (genreId) {
-      includeClause = [
-        {
-          model: Genre,
-          where: { id: genreId },
-          through: { attributes: [] },
+    const esQuery: any = {
+      index: 'articles',
+      from: offset,
+      size: limitNumber,
+      body: {
+        sort: [
+          {
+            createdAt: {
+              order: 'desc', // Sort by recency (latest articles first)
+            },
+          },
+        ],
+        query: {
+          bool: {
+            must: [],
+          },
         },
-        {
-          model: User,
-          attributes: ['id', 'name'],
-        }
-      ];
+      },
+    };
+
+    // Handle search query
+    if (query) {
+      esQuery.body.query.bool.must.push({
+        multi_match: {
+          query: query,
+          fields: ['title', 'content'],
+        },
+      });
     }
 
     // Handle author filter
     if (authorId) {
-      whereClause.author_id = authorId;
+      esQuery.body.query.bool.must.push({
+        term: { author_id: authorId },
+      });
     }
 
-    // Handle related articles based on genre when articleId is provided
+    // Handle genre filter
+    if (genreId) {
+      esQuery.body.query.bool.must.push({ term: { genres: parseInt(genreId as string, 10) } });
+    }
+
+    // Handle related articles filter
     if (articleId) {
-      whereClause.id = { [Op.ne]: articleId };
+      esQuery.body.query.bool.must.push({
+        bool: {
+          must_not: {
+            term: { _id: articleId },
+          },
+        },
+      });
+
+      // Retrieve the genres of the current article to find related articles
       const currentArticle = await Article.findByPk(articleId, {
-        include: [{ model: Genre }]
+        include: [{ model: Genre }],
       });
-      if (!currentArticle) {
-        return res.status(404).json({ message: 'Article not found' });
+
+      if (currentArticle) {
+        const genreIds = currentArticle.Genres.map((genre: { id: any }) => genre.id);
+        esQuery.body.query.bool.must.push({
+          terms: { genres: genreIds },
+        });
       }
-      const genreIds = currentArticle.Genres.map((genre: { id: any }) => genre.id);
-      includeClause[0].where = { id: { [Op.in]: genreIds } };
     }
 
-    // Use Elasticsearch for search query
-    if (query) {
-      // Cast query to a string
-      const searchQuery = query as string;
+    // Perform the search query in Elasticsearch
+    const esResult = await elasticClient.search(esQuery);
 
-      // Perform the search on Elasticsearch
-      const esResult = await elasticClient.search({
-        index: 'articles',
-        from: offset,
-        size: limitNumber,
-        body: {
-          query:{
-            multi_match: {
-              query: searchQuery,
-              fields: ['title', 'content'],
-            },
-          }
-        },
-      });
+    // Extract article IDs from Elasticsearch results
+    const articleIds = esResult.hits.hits.map((hit: any) => hit._id);
 
-      // Extract article IDs from Elasticsearch results
-      const articleIds = esResult.hits.hits.map((hit: any) => hit._id);
+    // Safely access the total hits value
+    const totalHits = esResult.hits.total ? (typeof esResult.hits.total === 'number' ? esResult.hits.total : esResult.hits.total.value) : 0;
 
-      // Fetch articles with Sequelize using the IDs retrieved from Elasticsearch
-      const { count, rows: articles } = await Article.findAndCountAll({
-        where: {
-          ...whereClause,
-          id: { [Op.in]: articleIds }, // Filter based on Elasticsearch results
-        },
-        include: includeClause,
-        order: [['createdAt', 'DESC']],
-        limit: limitNumber,
-        offset,
-        distinct: true,
-      });
-
-      // Handle the total from Elasticsearch results (handling both number and object cases)
-      const totalHits = typeof esResult.hits.total === 'number' 
-        ? esResult.hits.total 
-        : esResult.hits.total?.value ?? 0;
-
-      const totalPages = Math.ceil(totalHits / limitNumber);
-
-      return res.status(200).json({
-        articles,
-        currentPage: pageNumber,
-        totalPages,
-        totalItems: totalHits,
-      });
-    }
-
-    // Fallback to regular Sequelize if no search query is provided
+    // Fetch articles from the database to include associations like User and Genre
     const { count, rows: articles } = await Article.findAndCountAll({
-      where: whereClause,
-      include: includeClause,
+      where: {
+        id: articleIds,
+      },
+      include: [
+        { model: User, attributes: ['id', 'name'] },
+        Genre,
+      ],
       order: [['createdAt', 'DESC']],
-      limit: limitNumber,
-      offset,
       distinct: true,
     });
 
-    const totalPages = Math.ceil(count / limitNumber);
+    const totalPages = Math.ceil(totalHits / limitNumber);
 
     return res.status(200).json({
       articles,
       currentPage: pageNumber,
       totalPages,
-      totalItems: count,
+      totalItems: totalHits,
     });
   } catch (error) {
     console.error(error);
@@ -310,10 +150,20 @@ export const getArticles = async (req: Request, res: Response): Promise<Response
 export const getSingleArticle = async (req: Request, res: Response): Promise<Response> => {
   const { id } = req.params;
   try {
-    const article = await Article.findByPk(id, {
-      include: [{ model: User, attributes: ['id', 'name'] }, Genre],
+    // Fetch article from Elasticsearch
+    const esResult = await elasticClient.get({
+      index: 'articles',
+      id: id,
     });
-    if (article) {
+
+    if (esResult.found) {
+      const articleData = esResult._source;
+
+      // Fetch related user and genre details from the database
+      const article = await Article.findByPk(id, {
+        include: [{ model: User, attributes: ['id', 'name'] }, Genre],
+      });
+
       return res.status(200).json(article);
     } else {
       return res.status(404).json({ message: 'Article not found' });
@@ -339,20 +189,8 @@ export const createArticle = async (req: AuthRequest, res: Response): Promise<Re
       await newArticle.addGenres(genres);
     }
 
-    // Index the new article in Elasticsearch
-    await elasticClient.index({
-      index: 'articles',
-      id: newArticle.id.toString(),
-      body: {
-        title: newArticle.title,
-        content: newArticle.content,
-        author_id: newArticle.author_id,
-        thumbnail: newArticle.thumbnail,
-        genres: genreIds || [],
-        createdAt: newArticle.createdAt,
-        updatedAt: newArticle.updatedAt,
-      },
-    });
+    // Index the new article in Elasticsearch (non-blocking)
+    indexArticleInElasticsearch(newArticle, genreIds);
 
     return res.status(201).json(newArticle);
   } catch (error) {
@@ -360,7 +198,6 @@ export const createArticle = async (req: AuthRequest, res: Response): Promise<Re
     return res.status(500).json({ message: 'Internal server error' });
   }
 };
-
 
 export const updateArticle = async (req: AuthRequest, res: Response): Promise<Response> => {
   const { id } = req.params;
@@ -383,21 +220,8 @@ export const updateArticle = async (req: AuthRequest, res: Response): Promise<Re
       await article.setGenres(genres);
     }
 
-    // Update the article in Elasticsearch
-    await elasticClient.update({
-      index: 'articles',
-      id: article.id.toString(),
-      body: {
-        doc: {
-          title: article.title,
-          content: article.content,
-          author_id: article.author_id,
-          thumbnail: article.thumbnail,
-          genres: genreIds || [],
-          updatedAt: article.updatedAt,
-        },
-      },
-    });
+    // Update the article in Elasticsearch (non-blocking)
+    indexArticleInElasticsearch(article, genreIds);
 
     return res.status(200).json(article);
   } catch (error) {
@@ -419,11 +243,16 @@ export const deleteArticle = async (req: AuthRequest, res: Response): Promise<Re
 
     await article.destroy();
 
-    // Delete the article from Elasticsearch
-    await elasticClient.delete({
-      index: 'articles',
-      id: id.toString(),
-    });
+    // Delete the article from Elasticsearch (non-blocking)
+    try {
+      await elasticClient.delete({
+        index: 'articles',
+        id: id.toString(),
+      });
+    } catch (error) {
+      console.error(`Failed to delete article ${id} from Elasticsearch:`, error);
+      // We don't throw the error here, as the article has already been deleted from the database
+    }
 
     return res.status(204).json({ message: 'Article deleted successfully' });
   } catch (error) {

@@ -47,6 +47,7 @@ export default function SingleArticle({ article }: SingleArticleProps) {
     try {
       await createComment(article.id, content);
       fetchComments(); // Update UI
+      toast.success("Comment created successfully");
     }
     catch (err) {
       console.log(err);
@@ -58,6 +59,7 @@ export default function SingleArticle({ article }: SingleArticleProps) {
     try {
       await deleteCommentById(article.id, commentId); // Pass articleId alongside commentId
       setComments((prev) => prev.filter((comment) => comment.id !== commentId)); // Update state locally
+      toast.success("Comment deleted successfully");
     }
     catch (err) {
       console.log(err);
@@ -69,6 +71,7 @@ export default function SingleArticle({ article }: SingleArticleProps) {
     try {
       await updateCommentById(article.id, commentId, content); // Pass articleId alongside commentId
       fetchComments(); // Update UI
+      toast.success("Comment updated successfully");
     }
     catch (err) {
       console.log(err);
@@ -105,6 +108,9 @@ export default function SingleArticle({ article }: SingleArticleProps) {
               />
             </div>
           )}
+          <p className="text-xs text-gray-500 mb-1 line-clamp-1">
+            {article?.Genres?.map((genre: any) => genre.name).join(" / ")}
+          </p>
           <div className="prose max-w-none text-xl font-medium">
             {article.content.split("\n").map((paragraph, index) => (
               <p key={index}>{paragraph}</p>

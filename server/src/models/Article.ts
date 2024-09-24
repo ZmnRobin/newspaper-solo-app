@@ -26,6 +26,7 @@ class Article extends Model<ArticleAttributes, ArticleCreationAttributes> implem
   public static associations: {
     genres: Association<Article, Genre>;
   };
+    Genres: any;
 }
 // Function to initialize the model
 const initArticleModel = (sequelize: Sequelize) => {

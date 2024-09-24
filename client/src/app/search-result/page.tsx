@@ -66,7 +66,7 @@ export default function SearchResult() {
     return (
       <div className="container mx-auto w-9/12 p-5">
         <h1 className="text-3xl font-semibold mb-4">
-          No results found for "{query}".
+          <span className="text-2xl text-gray-400">No results found for </span>"{query}".
         </h1>
       </div>
     );
@@ -75,7 +75,7 @@ export default function SearchResult() {
   return (
     <div className="container mx-auto w-9/12 p-5">
       <h1 className="text-3xl font-semibold mb-4">
-        Search Results for "{query}"
+      <span className="text-2xl text-gray-400">Search results for </span>"{query}".
       </h1>
       {results.map((article) => (
         <SearchCard key={article.id} article={article} />

@@ -9,7 +9,7 @@ interface AuthLayoutProps {
 
 const AuthLayout: React.FC<AuthLayoutProps> = ({ children, imageSrc, imageAlt }) => {
   return (
-    <div className="flex mt-6">
+    <div className="flex mt-1 mb-4">
       <div className="hidden lg:flex lg:w-1/2  items-center justify-center">
         <Image src={imageSrc} alt={imageAlt} width={600} height={600} objectFit="cover" />
       </div>

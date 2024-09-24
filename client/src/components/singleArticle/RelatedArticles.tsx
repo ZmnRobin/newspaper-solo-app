@@ -8,7 +8,6 @@ interface RelatedArticlesProps {
   articles: Articles[];
 }
 
-
 export default function RelatedArticles({ articles }: RelatedArticlesProps) {
   return (
     <div className="lg:col-span-3">
@@ -29,16 +28,26 @@ export default function RelatedArticles({ articles }: RelatedArticlesProps) {
               </Link>
               <div className="mt-1">
                 <Link href={`/${article.id}`}>
-                  <h3 className="font-semibold hover:text-sky-500">{article.title}</h3>
+                  <h3 className="font-semibold hover:text-sky-500">
+                    {article.title}
+                  </h3>
                 </Link>
+                <p className="text-xs text-gray-500 mb-1 line-clamp-1">
+                  {article?.Genres?.map((genre: any) => genre.name).join(" / ")}
+                </p>
                 <p className="text-sm text-gray-500">
-                  {article.User.name} . <span>{convertDateFormat(article.createdAt.toString())}</span>
+                  {article.User.name} .{" "}
+                  <span>{convertDateFormat(article.createdAt.toString())}</span>
                 </p>
               </div>
             </div>
           ))}
         </div>
-        {articles.length === 0 && <div className="m-5 text-center text-red-400">No related articles</div>}
+        {articles.length === 0 && (
+          <div className="m-5 text-center text-red-400">
+            No related articles
+          </div>
+        )}
       </div>
     </div>
   );

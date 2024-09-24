@@ -76,8 +76,7 @@ export default function CommentList({
             </h3>
             {editCommentId === comment.id ? (
               <div className="flex items-center mt-2">
-                <input
-                  type="text"
+                <textarea
                   className="w-full border p-2"
                   value={editContent}
                   onChange={(e) => setEditContent(e.target.value)}

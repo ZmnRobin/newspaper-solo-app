@@ -1,6 +1,5 @@
 import React from "react";
 import ArticleCard from "./ArticleCard";
-import Skeleton from "../skeleton/Skeleton";
 import { Articles } from "@/types/types";
 import ArticleListSkeleton from "../skeleton/ArticleListSkeleton";
 

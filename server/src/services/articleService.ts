@@ -3,6 +3,7 @@ import elasticClient from '../config/elasticsearch';
 
 export const indexArticle = async (article: any) => {
   try {
+    const genres = await article.getGenres(); // Fetch genres associated with the article
     await elasticClient.index({
       index: 'articles',
       id: article.id.toString(),
@@ -10,7 +11,10 @@ export const indexArticle = async (article: any) => {
         title: article.title,
         content: article.content,
         author_id: article.author_id,
-        published_at: article.published_at,
+        thumbnail: article.thumbnail,
+        createdAt: article.createdAt,
+        updatedAt: article.updatedAt,
+        genres: genres.map((genre: any) => genre.id), // Include only genre IDs
       },
     });
   } catch (error) {
@@ -20,7 +24,9 @@ export const indexArticle = async (article: any) => {
 
 // Sync existing articles from the database into Elasticsearch
 export const syncAllArticles = async () => {
-  const articles = await Article.findAll();
+  const articles = await Article.findAll({
+    include: ['Genres'], // Ensure genres are loaded with the article
+  });
   for (const article of articles) {
     await indexArticle(article);
   }

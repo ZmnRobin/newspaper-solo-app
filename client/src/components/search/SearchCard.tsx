@@ -9,7 +9,7 @@ interface SearchCardProps {
 
 const SearchCard: React.FC<SearchCardProps> = ({ article }) => {
   return (
-    <div className="flex items-start shadow-md p-4 mt-3">
+    <div className="flex items-start shadow-sm p-4 mt-3">
       <div className="w-1/4">
         <Link href={`/${article.id}`}>
           <img
