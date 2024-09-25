@@ -4,6 +4,7 @@ import db from '../models';
 import { Op } from 'sequelize';
 import elasticClient from '../config/elasticsearch';
 import { emitArticleIndexed } from '..';
+import { getRecommendedArticles, trackArticleView } from '../services/recommendationService';
 
 const Article = db.articles;
 const User = db.users;
@@ -50,6 +51,7 @@ export const getArticles = async (req: Request, res: Response): Promise<Response
       index: 'articles',
       from: offset,
       size: limitNumber,
+      // track_total_hits: true,
       body: {
         sort: [
           {
@@ -149,6 +151,7 @@ export const getArticles = async (req: Request, res: Response): Promise<Response
 
 export const getSingleArticle = async (req: Request, res: Response): Promise<Response> => {
   const { id } = req.params;
+  const userIp = req.ip;
   try {
     // Fetch article from Elasticsearch
     const esResult = await elasticClient.get({
@@ -164,10 +167,25 @@ export const getSingleArticle = async (req: Request, res: Response): Promise<Res
         include: [{ model: User, attributes: ['id', 'name'] }, Genre],
       });
 
+      await trackArticleView(article.id, userIp || '');
+
       return res.status(200).json(article);
     } else {
       return res.status(404).json({ message: 'Article not found' });
     }
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
+export const getRecommendations = async (req: Request, res: Response): Promise<Response> => {
+  const userIp = req.ip;
+  const { limit = 10 } = req.query;
+
+  try {
+    const recommendedArticles = await getRecommendedArticles(userIp||'', Number(limit));
+    return res.status(200).json(recommendedArticles);
   } catch (error) {
     console.error(error);
     return res.status(500).json({ message: 'Internal server error' });

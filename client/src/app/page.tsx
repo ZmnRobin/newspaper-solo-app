@@ -1,6 +1,7 @@
 "use client";
 import ArticleList from "@/components/articles/ArticleList";
 import CustomLoader from "@/components/loader/CustomLoader";
+import { backendUrl } from "@/configs/constants";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import { getAllArticles } from "@/services/newsService";
 import { Articles } from "@/types/types";
@@ -16,9 +17,9 @@ export default function Home() {
 
     // Initialize the Socket.io client
     useEffect(() => {
-      const socket = io("http://localhost:5000");
+      const socket = io(`${backendUrl}`);
   
-      // Listen for the 'articleIndexed' event
+      // Listen for the 'articleIndexed' event that fired when a new article is indexed
       socket.on('articleIndexed', (newArticle) => {
         setArticles((prevArticles) => [newArticle, ...prevArticles]);
       });

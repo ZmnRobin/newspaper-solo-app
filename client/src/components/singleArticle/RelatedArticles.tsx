@@ -14,7 +14,7 @@ export default function RelatedArticles({ articles }: RelatedArticlesProps) {
       <div className="bg-white shadow p-4">
         <h2 className="font-bold text-xl mb-4">Related Articles</h2>
         <div className="space-y-4">
-          {articles.map((article) => (
+          {articles?.map((article) => (
             <div key={article.id}>
               <Link href={`/${article.id}`}>
                 <div className="relative w-full h-40">
@@ -36,8 +36,10 @@ export default function RelatedArticles({ articles }: RelatedArticlesProps) {
                   {article?.Genres?.map((genre: any) => genre.name).join(" / ")}
                 </p>
                 <p className="text-sm text-gray-500">
-                  {article.User.name} .{" "}
                   <span>{convertDateFormat(article.createdAt.toString())}</span>
+                </p>
+                <p className="text-sm text-gray-500">
+                  Views: {article.ArticleViews[0]?.views || 0}
                 </p>
               </div>
             </div>

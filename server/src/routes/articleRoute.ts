@@ -6,6 +6,7 @@ import {
   getSingleArticle,
   deleteArticle,
   updateArticle,
+  getRecommendations,
 } from "../controllers/articleController";
 import verifyToken from "../middlewares/authMiddleware";
 import {
@@ -33,6 +34,9 @@ export default function (upload: Multer) {
 
   // Delete an article (protected route)
   router.delete("/:id", verifyToken, deleteArticle);
+
+  // recommended articles route
+  router.get("/recommended/articles", getRecommendations);
 
   // Comment routes (keep as they are)
   router.post("/:articleId/comments", verifyToken, createComment);

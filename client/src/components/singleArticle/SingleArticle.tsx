@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Articles, Comment } from "@/types/types";
-import { createComment, deleteCommentById, getCommentsByArticle, getRelatedArticles, updateCommentById } from "@/services/newsService";
+import { createComment, deleteCommentById, getCommentsByArticle, getRecommensdedArticles, getRelatedArticles, updateCommentById } from "@/services/newsService";
 import CommentList from "./CommentList";
 import CommentForm from "./CommentForm";
 import RelatedArticles from "./RelatedArticles";
@@ -37,9 +37,25 @@ export default function SingleArticle({ article }: SingleArticleProps) {
     }
   };
 
+  const fetchRecomendedArticles = async () => {
+    try {
+      setLoading(true);
+      const data = await getRecommensdedArticles();
+      setRelatedArticles(data);
+
+      console.log(data);
+      setLoading(false);
+    }
+    catch (err) {
+      console.log(err);
+      toast.error("Failed to fetch related articles");
+      setLoading(false);
+    }
+  }
+
   useEffect(() => {
-    fetchRelatedArticles();
     fetchComments();
+    fetchRecomendedArticles();
   }, []);
 
   // Pass both commentId and articleId for delete and update
@@ -78,6 +94,7 @@ export default function SingleArticle({ article }: SingleArticleProps) {
       toast.error("Failed to update comment");
     }
   };
+
 
   return (
     <div className="container mx-auto px-5 py-8">

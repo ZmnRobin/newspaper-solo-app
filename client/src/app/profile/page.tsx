@@ -79,7 +79,7 @@ export default function UserProfilePage() {
 
   const handleDelete = async (articleId: number) => {
     try {
-      await axiosInstance.delete(`/articles/${articleId}`);
+      await axiosInstance.delete(`/api/articles/${articleId}`);
       setArticles((prevArticles) =>
         prevArticles.filter((article) => article.id !== articleId) // Check if both are numbers
       );
@@ -115,6 +115,15 @@ export default function UserProfilePage() {
         >
           Try Again
         </button>
+      </div>
+    );
+  }
+
+  if(articles.length === 0){
+    return (
+      <div className="container">
+        <h1 className="text-2xl font-bold mb-6">My Articles</h1>
+        <p className="text-red-500">No articles found</p>
       </div>
     );
   }

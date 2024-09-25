@@ -14,7 +14,7 @@ export default function EditArticlePage() {
   useEffect(() => {
     const fetchArticle = async () => {
       try {
-        const response = await axiosInstance.get(`${backendUrl}/articles/${editId}`);
+        const response = await axiosInstance.get(`${backendUrl}/api/articles/${editId}`);
         setArticleData(response.data); // Set the existing article data
       } catch (error) {
         console.error("Error fetching article:", error);

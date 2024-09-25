@@ -39,7 +39,7 @@ export default function ArticleForm({ article, editId }: ArticleFormProps) {
   useEffect(() => {
     const fetchGenres = async () => {
       try {
-        const response = await axiosInstance.get(`${backendUrl}/genres`);
+        const response = await axiosInstance.get(`${backendUrl}/api/genres`);
         setGenres(response.data);
       } catch (error) {
         console.error("Error fetching genres:", error);
@@ -79,7 +79,7 @@ export default function ArticleForm({ article, editId }: ArticleFormProps) {
 
     try {
       if (editId) {
-        await axiosInstance.put(`${backendUrl}/articles/${editId}`, formData, {
+        await axiosInstance.put(`${backendUrl}/api/articles/${editId}`, formData, {
           headers: {
             "Content-Type": "multipart/form-data",
           },
@@ -87,7 +87,7 @@ export default function ArticleForm({ article, editId }: ArticleFormProps) {
         toast.success("Article updated successfully!");
         router.push("/profile");
       } else {
-        await axiosInstance.post(`${backendUrl}/articles`, formData, {
+        await axiosInstance.post(`${backendUrl}/api/articles`, formData, {
           headers: {
             "Content-Type": "multipart/form-data",
           },
@@ -128,7 +128,7 @@ export default function ArticleForm({ article, editId }: ArticleFormProps) {
           required
         />
 
-        <input type="file" accept="image/*" onChange={handleThumbnailChange} className="w-full border p-2" />
+        <input type="file" accept="image/png, image/jpeg , image/jpg" onChange={handleThumbnailChange} className="w-full border p-2" />
         {thumbnailPreview && <img src={thumbnailPreview} alt="Thumbnail preview" className="w-full mt-2" />}
         {!thumbnail && article?.thumbnail && (
           <img src={getImageSrc(article?.thumbnail)} alt="Existing thumbnail" className="w-full mt-2" />

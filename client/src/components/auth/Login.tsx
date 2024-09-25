@@ -21,7 +21,7 @@ const Login: React.FC = () => {
     try {
       // Call the login API directly
       const response = await axios.post(
-        `${backendUrl}/users/login`,
+        `${backendUrl}/api/users/login`,
         {
           email,
           password,

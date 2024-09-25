@@ -29,6 +29,8 @@ interface DbInterface {
   articles?: any;
   comments?: any;
   genres?: any;
+  visitors?: any;
+  articleViews?: any;
 }
 
 const db: DbInterface = {
@@ -41,12 +43,16 @@ import initUserModel from './User';
 import initArticleModel from './Article';
 import initCommentModel from './Comment';
 import initGenreModel from './Genre';
+import { initVisitorModel } from './Visitor';
+import { initArticleViewModel } from './ArticleView';
 
 // Initialize models
 db.users = initUserModel(sequelize);
 db.articles = initArticleModel(sequelize);
 db.comments = initCommentModel(sequelize);
 db.genres = initGenreModel(sequelize);
+db.visitors = initVisitorModel(sequelize);
+db.articleViews = initArticleViewModel(sequelize);
 
 // Define relationships after models are initialized
 db.articles.belongsTo(db.users, { foreignKey: 'author_id' });
@@ -55,5 +61,12 @@ db.comments.belongsTo(db.articles, { foreignKey: 'article_id', onDelete: 'CASCAD
 // Many-to-many relationship between Articles and Genres
 db.articles.belongsToMany(db.genres, { through: 'ArticleGenres' ,foreignKey: 'article_id' });
 db.genres.belongsToMany(db.articles, { through: 'ArticleGenres', foreignKey: 'genre_id' });
+
+// Many-to-many relationship between Visitors and Articles
+// Define relationships
+db.visitors.hasMany(db.articleViews, { foreignKey: 'visitor_id' });
+db.articleViews.belongsTo(db.visitors, { foreignKey: 'visitor_id' });
+db.articles.hasMany(db.articleViews, { foreignKey: 'article_id' });
+db.articleViews.belongsTo(db.articles, { foreignKey: 'article_id' });
 
 export default db;

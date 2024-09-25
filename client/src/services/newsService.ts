@@ -7,7 +7,7 @@ import { backendUrl } from "@/configs/constants";
 export const getAllArticles = async (page: any) => {
   try {
     const response = await axios.get(
-      `${backendUrl}/articles?page=${page}&limit=10`
+      `${backendUrl}/api/articles?page=${page}&limit=10`
     );
     return response.data;
   } catch (error) {
@@ -18,7 +18,7 @@ export const getAllArticles = async (page: any) => {
 
 export const getSingleArticlesById = async (id: any) => {
   try {
-    const response = await axios.get(`${backendUrl}/articles/${id}`);
+    const response = await axios.get(`${backendUrl}/api/articles/${id}`);
     return response.data;
   } catch (error) {
     console.error(`Error fetching news with id ${id}:`, error);
@@ -28,7 +28,7 @@ export const getSingleArticlesById = async (id: any) => {
 
 export const getArticlesByAuthor = async (authorId: any,page:any) => {
   try {
-    const response = await axiosInstance.get(`${backendUrl}/articles?authorId=${authorId}&page=${page}&limit=10`);
+    const response = await axiosInstance.get(`${backendUrl}/api/articles?authorId=${authorId}&page=${page}&limit=10`);
     return response.data;
   } catch (error) {
     console.error(`Error fetching articles by author:`, error);
@@ -38,7 +38,7 @@ export const getArticlesByAuthor = async (authorId: any,page:any) => {
 
 export const getArticlesByGenre = async (genreId: any,page:any) => {
   try {
-    const response = await axios.get(`${backendUrl}/articles?genreId=${genreId}&page=${page}&limit=10`);
+    const response = await axios.get(`${backendUrl}/api/articles?genreId=${genreId}&page=${page}&limit=10`);
     return response.data;
   } catch (error) {
     console.error(`Error fetching articles by genre:`, error);
@@ -49,7 +49,7 @@ export const getArticlesByGenre = async (genreId: any,page:any) => {
 export const getRelatedArticles = async (articleId: any) => {
   try {
     const response = await axios.get(
-      `${backendUrl}/articles?articleId=${articleId}&limit=5`
+      `${backendUrl}/api/articles?articleId=${articleId}&limit=5`
     );
     return response.data;
   } catch (error) {
@@ -58,10 +58,20 @@ export const getRelatedArticles = async (articleId: any) => {
   }
 };
 
+export const getRecommensdedArticles = async () => {
+  try {
+    const response = await axios.get(`${backendUrl}/api/articles/recommended/articles`);
+    return response.data;
+  } catch (error) {
+    console.error(`Error fetching recommended articles:`, error);
+    throw error;
+  }
+}
+
 export const searchArticles = async (query: any,page:any) => {
   try {
     const response = await axios.get(
-      `${backendUrl}/articles?query=${encodeURIComponent(query)}&page=${page}&limit=10`
+      `${backendUrl}/api/articles?query=${encodeURIComponent(query)}&page=${page}&limit=10`
     );
     return response.data;
   } catch (error) {
@@ -72,7 +82,7 @@ export const searchArticles = async (query: any,page:any) => {
 
 export const deleteArticleById = async (articleId: any) => {
   try {
-    const response = await axiosInstance.delete(`/articles/${articleId}`);
+    const response = await axiosInstance.delete(`/api/articles/${articleId}`);
     return response.data;
   } catch (error) {
     console.error(`Error deleting article:`, error);
@@ -84,7 +94,7 @@ export const deleteArticleById = async (articleId: any) => {
 // Genre services
 export const getAllGenres = async () => {
   try {
-    const response = await axios.get(`${backendUrl}/genres`);
+    const response = await axios.get(`${backendUrl}/api/genres`);
     return response.data;
   } catch (error) {
     console.error("Error fetching all genres:", error);
@@ -94,7 +104,7 @@ export const getAllGenres = async () => {
 
 export const createGenre = async (name: any) => {
   try {
-    const response = await axiosInstance.post(`/genres`, { name });
+    const response = await axiosInstance.post(`/api/genres`, { name });
     return response.data;
   } catch (error) {
     console.error(`Error creating genre:`, error);
@@ -106,7 +116,7 @@ export const createGenre = async (name: any) => {
 export const createComment = async (articleId: any, content: any) => {
   try {
     const response = await axiosInstance.post(
-      `/articles/${articleId}/comments`,
+      `/api/articles/${articleId}/comments`,
       { content }
     );
     return response.data;
@@ -118,7 +128,7 @@ export const createComment = async (articleId: any, content: any) => {
 
 export const getCommentsByArticle = async (articleId: any) => {
   try {
-    const response = await axiosInstance.get(`/articles/${articleId}/comments`);
+    const response = await axiosInstance.get(`/api/articles/${articleId}/comments`);
     return response.data;
   } catch (error) {
     console.error(`Error fetching comments:`, error);
@@ -129,7 +139,7 @@ export const getCommentsByArticle = async (articleId: any) => {
 export const deleteCommentById = async (articleId: any, commentId: any) => {
   try {
     const response = await axiosInstance.delete(
-      `/articles/${articleId}/comments/${commentId}`
+      `/api/articles/${articleId}/comments/${commentId}`
     );
     return response.data;
   } catch (error) {
@@ -145,7 +155,7 @@ export const updateCommentById = async (
 ) => {
   try {
     const response = await axiosInstance.put(
-      `/articles/${articleId}/comments/${commentId}`,
+      `/api/articles/${articleId}/comments/${commentId}`,
       { content }
     );
     return response.data;
