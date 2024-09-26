@@ -1,5 +1,6 @@
 "use client";
 import ArticleList from "@/components/articles/ArticleList";
+import { useUser } from "@/components/context/userContext";
 import CustomLoader from "@/components/loader/CustomLoader";
 import { backendUrl } from "@/configs/constants";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
@@ -10,24 +11,33 @@ import { io } from "socket.io-client";
 
 export default function Home() {
   const [articles, setArticles] = useState<Articles[]>([]);
-  const [page, setPage] = useState(1); 
+  const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [hasMore, setHasMore] = useState(true); 
+  const [hasMore, setHasMore] = useState(true);
+  const {createdArticle} = useUser();
 
-    // Initialize the Socket.io client
-    useEffect(() => {
-      const socket = io(`${backendUrl}`);
-  
-      // Listen for the 'articleIndexed' event that fired when a new article is indexed
-      socket.on('articleIndexed', (newArticle) => {
-        setArticles((prevArticles) => [newArticle, ...prevArticles]);
-      });
-  
-      return () => {
-        socket.disconnect();
-      };
-    }, []);
+  // Initialize the Socket.io client
+  useEffect(() => {
+    const socket = io(`${backendUrl}`);
+
+    socket.on("connect", () => {
+      console.log("Socket connected");
+    });
+
+    socket.on("disconnect", () => {
+      console.log("Socket disconnected");
+    });
+
+    socket.on("articleIndexed", (newArticle) => {
+      console.log("New article indexed:", newArticle);
+      setArticles((prevArticles) => [newArticle, ...prevArticles]);
+    });
+
+    return () => {
+      socket.disconnect();
+    };
+  }, []);
 
   // Fetch more articles when scrolling reaches the end
   const fetchMoreArticles = async () => {
@@ -54,24 +64,27 @@ export default function Home() {
   useEffect(() => {
     const fetchArticles = async () => {
       setLoading(true);
-        try {
-          const data = await getAllArticles(page);
-          setArticles(data?.articles);
-          setPage((prev) => prev + 1);
-          setLoading(false);
-        } catch (err) {
-          setError("Failed to fetch articles");
-        } finally {
-          setLoading(false);
-        }
+      try {
+        const data = await getAllArticles(page);
+        setArticles(data?.articles);
+        setPage((prev) => prev + 1);
+        setLoading(false);
+      } catch (err) {
+        setError("Failed to fetch articles");
+      } finally {
+        setLoading(false);
+      }
     };
-    fetchArticles();
+    setTimeout(() => {
+      fetchArticles();
+    }
+    , 500);
   }, []);
 
   return (
     <>
       {error && <div>{error}</div>}
-      <ArticleList articles={articles} loading={loading}/>
+      <ArticleList articles={articles} loading={loading} />
       {isFetching && hasMore && <CustomLoader />}
     </>
   );

@@ -25,7 +25,7 @@ const httpServer = createServer(app);
 // Initialize Socket.io
 const io = new Server(httpServer, {
   cors: {
-    origin: "*", // Replace '*' with your frontend URL in production for security
+    origin: "http://localhost:3000", // Replace '*' with your frontend URL in production for security
     methods: ["GET", "POST"]
   }
 });

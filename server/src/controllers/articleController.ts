@@ -181,10 +181,10 @@ export const getSingleArticle = async (req: Request, res: Response): Promise<Res
 
 export const getRecommendations = async (req: Request, res: Response): Promise<Response> => {
   const userIp = req.ip;
-  const { limit = 10 } = req.query;
+  const { limit , articleId } = req.query;
 
   try {
-    const recommendedArticles = await getRecommendedArticles(userIp||'', Number(limit));
+    const recommendedArticles = await getRecommendedArticles(userIp||'', Number(limit), articleId ? Number(articleId) : undefined);
     return res.status(200).json(recommendedArticles);
   } catch (error) {
     console.error(error);

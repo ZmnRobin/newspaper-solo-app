@@ -23,6 +23,7 @@ export type Articles = {
     updatedAt: Date;
     User: User;
     Genres: Genre[];
+    totalViews: string;
 }
 export type Comment = {
     id: number;

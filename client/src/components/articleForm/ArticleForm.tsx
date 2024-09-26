@@ -7,6 +7,7 @@ import { getImageSrc } from "@/utils/sharedFunction";
 import toast from "react-hot-toast";
 import { FaPlus } from "react-icons/fa";
 import { createGenre } from "@/services/newsService";
+import { useUser } from "../context/userContext";
 
 interface Genre {
   id: number;
@@ -35,6 +36,7 @@ export default function ArticleForm({ article, editId }: ArticleFormProps) {
   const [isModalOpen, setIsModalOpen] = useState(false); // State for modal visibility
   const [newGenreName, setNewGenreName] = useState(""); // State for new genre name
   const router = useRouter();
+  const {setCreatedArticle} = useUser();  
 
   useEffect(() => {
     const fetchGenres = async () => {
@@ -93,6 +95,7 @@ export default function ArticleForm({ article, editId }: ArticleFormProps) {
           },
         });
         toast.success("Article created successfully!");
+        setCreatedArticle(true);
         router.push("/");
       }
     } catch (error) {

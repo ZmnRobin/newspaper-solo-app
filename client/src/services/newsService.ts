@@ -58,9 +58,9 @@ export const getRelatedArticles = async (articleId: any) => {
   }
 };
 
-export const getRecommensdedArticles = async () => {
+export const getRecommensdedArticles = async (articleId?:any,limit?:any) => {
   try {
-    const response = await axios.get(`${backendUrl}/api/articles/recommended/articles`);
+    const response = await axios.get(`${backendUrl}/api/articles/recommended/articles?articleId=${articleId}&limit=${limit}`);
     return response.data;
   } catch (error) {
     console.error(`Error fetching recommended articles:`, error);

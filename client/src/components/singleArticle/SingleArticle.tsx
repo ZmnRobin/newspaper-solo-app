@@ -40,7 +40,7 @@ export default function SingleArticle({ article }: SingleArticleProps) {
   const fetchRecomendedArticles = async () => {
     try {
       setLoading(true);
-      const data = await getRecommensdedArticles();
+      const data = await getRecommensdedArticles(article.id, 5);
       setRelatedArticles(data);
 
       console.log(data);

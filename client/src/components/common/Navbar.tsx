@@ -7,6 +7,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { getAllGenres } from "@/services/newsService";
 import { useUser } from "../context/userContext";
 import { Genre } from "@/types/types";
+import toast from "react-hot-toast";
 
 export default function Navbar() {
   const { user, logout } = useUser();
@@ -16,7 +17,9 @@ export default function Navbar() {
   const [categories, setCategories] = useState<Genre[]>([]);
   const [showMoreDropdown, setShowMoreDropdown] = useState(false);
   const [activeNavItem, setActiveNavItem] = useState<string | null>(null);
-  const [selectedMoreLabel, setSelectedMoreLabel] = useState<string | null>(null);
+  const [selectedMoreLabel, setSelectedMoreLabel] = useState<string | null>(
+    null
+  );
   const router = useRouter();
 
   const MAX_VISIBLE_GENRES = 12;
@@ -32,17 +35,25 @@ export default function Navbar() {
   };
 
   useEffect(() => {
-    getAllGenres().then((data) => {
-      setCategories(data);
-    });
+    getAllGenres()
+      .then((data) => {
+        setCategories(data);
+      })
+      .catch((err) => {
+        toast.error("Failed to fetch genres!");
+        console.log(err);
+      });
   }, []);
 
   useEffect(() => {
     const genrePathMatch = pathname.match(/^\/genre\/(\d+)$/);
     if (genrePathMatch) {
       setActiveNavItem(genrePathMatch[1]);
+    } else if (pathname === "/articles/recommendations") {
+      setActiveNavItem("recommendations");
     } else {
       setActiveNavItem(null);
+      setSelectedMoreLabel(null);
     }
   }, [pathname]);
 
@@ -90,7 +101,7 @@ export default function Navbar() {
                 href={`/genre/${category.id}`}
                 className={`text-gray-700 hover:text-gray-900 ${
                   activeNavItem === category.id.toString()
-                    ? "font-bold text-blue-600 border-b-2 border-blue-600"
+                    ? "font-bold text-blue-600 border-b-2 border-blue-600 "
                     : ""
                 }`}
                 onClick={() => {
@@ -101,6 +112,21 @@ export default function Navbar() {
                 {category.name}
               </Link>
             ))}
+            <Link
+              href="/articles/recommendations"
+              className={`text-gray-700 hover:text-gray-900 ${
+                activeNavItem === "recommendations"
+                  ? "font-bold text-blue-600 border-b-2 border-blue-600"
+                  : ""
+              }`}
+              onClick={() => {
+                setActiveNavItem("recommendations");
+                setSelectedMoreLabel(null); // Reset the dropdown label
+              }}
+            >
+              Recommendations
+            </Link>
+
             {hiddenCategories.length > 0 && (
               <div
                 className="relative"
@@ -109,7 +135,9 @@ export default function Navbar() {
               >
                 <button
                   className={`flex items-center text-gray-700 hover:text-gray-900 ${
-                    selectedMoreLabel ? "underline font-bold text-blue-600" : ""
+                    selectedMoreLabel
+                      ? "font-bold text-blue-600 border-b-2 border-blue-600"
+                      : ""
                   }`}
                 >
                   {selectedMoreLabel || "More"}
@@ -123,7 +151,7 @@ export default function Navbar() {
                         href={`/genre/${category.id}`}
                         className={`block px-4 py-2 text-gray-700 hover:bg-gray-100 ${
                           activeNavItem === category.id.toString()
-                            ? "font-bold text-blue-600 bg-gray-100 underline" // Underline the selected item in the dropdown
+                            ? "font-bold text-blue-600 border-b-2 border-blue-600 bg-gray-100"
                             : ""
                         }`}
                         onClick={() => {
@@ -146,6 +174,7 @@ export default function Navbar() {
             </button>
           </div>
         </div>
+
         {showSearch && (
           <div className="flex justify-center w-full bg-white m-2 px-10">
             <input

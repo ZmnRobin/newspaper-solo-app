@@ -9,15 +9,15 @@ interface UserContextType {
   user: User | null;
   setUser: (user: User | null) => void;
   logout: () => void;
-  activeNavItem: string | null;
-  setActiveNavItem: (navItemId: string) => void;
+  createdArticle: boolean;
+  setCreatedArticle: (value: boolean) => void;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
 export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [activeNavItem, setActiveNavItem] = useState<string | null>(null);
+  const [createdArticle, setCreatedArticle] = useState<boolean>(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -35,7 +35,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   return (
-    <UserContext.Provider value={{ user, setUser, logout, activeNavItem, setActiveNavItem }}>
+    <UserContext.Provider value={{ user, setUser, logout, createdArticle, setCreatedArticle }}>
       {children}
     </UserContext.Provider>
   );

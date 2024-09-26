@@ -48,8 +48,15 @@ export default function ArticleCard({
             {article?.title}
           </h1>
         </Link>
+        {article?.User?.name && <p className="text-xs text-gray-500 mb-2">
+          Author: {article?.User?.name}
+        </p>}
+        {
+          article?.totalViews && <p className="text-xs text-gray-500 mb-2">
+            Views: {article?.totalViews}
+          </p>
+        }
         <p className="text-xs text-gray-500 mb-2">
-          {article?.User?.name} -{" "}
           {convertDateFormat(article?.createdAt.toString())}
         </p>
         <p className="text-xs text-gray-500 mb-2 line-clamp-1">
