@@ -40,14 +40,19 @@ export const createComment = async (req: AuthRequest, res: Response): Promise<Re
 export const getCommentsByArticle = async (req: Request, res: Response): Promise<Response> => {
   const { articleId } = req.params;
 
+  // Find all comments for the article in descending order
   try {
-    // Find all comments related to the article
     const comments = await Comment.findAll({
-      where: { article_id: articleId },
-      include: [{
-        model: User,
-        attributes: ['name', 'email'],
-      }], // Optionally include user data
+      where: {
+        article_id: articleId
+      },
+      include: [
+        {
+          model: User,
+          attributes: ['name', 'email']
+        }
+      ],
+      order: [['createdAt', 'DESC']]
     });
 
     return res.status(200).json(comments);

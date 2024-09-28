@@ -3,6 +3,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Articles } from "@/types/types";
 import { getImageSrc, convertDateFormat } from "@/utils/sharedFunction";
+import { FaEye } from "react-icons/fa";
 
 interface RelatedArticlesProps {
   articles: Articles[];
@@ -38,8 +39,8 @@ export default function RelatedArticles({ articles }: RelatedArticlesProps) {
                 <p className="text-sm text-gray-500">
                   <span>{convertDateFormat(article.createdAt.toString())}</span>
                 </p>
-                <p className="text-sm text-gray-500">
-                  Views: {article?.totalViews|| 0}
+                <p className="text-sm text-gray-500 flex">
+                  <FaEye size={15}/> <span className="ml-1">{article?.totalViews}</span>
                 </p>
               </div>
             </div>

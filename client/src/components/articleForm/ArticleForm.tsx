@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { backendUrl } from "@/configs/constants";
 import { getImageSrc } from "@/utils/sharedFunction";
 import toast from "react-hot-toast";
-import { FaPlus } from "react-icons/fa";
+import { FaPlus, FaTimes } from "react-icons/fa";
 import { createGenre } from "@/services/newsService";
 import { useUser } from "../context/userContext";
 
@@ -27,16 +27,16 @@ interface ArticleFormProps {
 export default function ArticleForm({ article, editId }: ArticleFormProps) {
   const [title, setTitle] = useState(article?.title || "");
   const [content, setContent] = useState(article?.content || "");
-  const [thumbnail, setThumbnail] = useState<File | null>(null);
-  const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(article?.thumbnail || null);
+  const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
+  const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(null);
   const [genres, setGenres] = useState<Genre[]>([]);
   const [selectedGenres, setSelectedGenres] = useState<number[]>(
     article?.Genres ? article.Genres.map((genre) => genre.id) : []
   );
-  const [isModalOpen, setIsModalOpen] = useState(false); // State for modal visibility
-  const [newGenreName, setNewGenreName] = useState(""); // State for new genre name
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [newGenreName, setNewGenreName] = useState("");
   const router = useRouter();
-  const {setCreatedArticle} = useUser();  
+  const { setCreatedArticle } = useUser();
 
   useEffect(() => {
     const fetchGenres = async () => {
@@ -49,15 +49,25 @@ export default function ArticleForm({ article, editId }: ArticleFormProps) {
       }
     };
     fetchGenres();
-  }, []);
+
+    // Set initial thumbnail preview for edit mode
+    if (editId && article?.thumbnail) {
+      setThumbnailPreview(getImageSrc(article.thumbnail));
+    }
+  }, [editId, article]);
 
   const handleThumbnailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      setThumbnail(file);
+      setThumbnailFile(file);
       const previewUrl = URL.createObjectURL(file);
       setThumbnailPreview(previewUrl);
     }
+  };
+
+  const handleRemoveThumbnail = () => {
+    setThumbnailFile(null);
+    setThumbnailPreview(null);
   };
 
   const handleGenreToggle = (id: number) => {
@@ -69,11 +79,31 @@ export default function ArticleForm({ article, editId }: ArticleFormProps) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    if (!title.trim()) {
+      toast.error("Title is required");
+      return;
+    }
+
+    if (!content.trim()) {
+      toast.error("Content is required");
+      return;
+    }
+
+    if (!thumbnailPreview && !editId) {
+      toast.error("A thumbnail image is required in order to create an article");
+      return;
+    }
+
+    if (selectedGenres.length === 0) {
+      toast.error("At least one genre must be selected");
+      return;
+    }
+
     const formData = new FormData();
     formData.append("title", title);
     formData.append("content", content);
-    if (thumbnail) {
-      formData.append("thumbnail", thumbnail);
+    if (thumbnailFile) {
+      formData.append("thumbnail", thumbnailFile);
     }
     selectedGenres.forEach((genreId) => {
       formData.append("genreIds[]", genreId.toString());
@@ -105,13 +135,16 @@ export default function ArticleForm({ article, editId }: ArticleFormProps) {
   };
 
   const handleCreateGenre = async () => {
-    if (!newGenreName.trim()) return;
+    if (!newGenreName.trim()) {
+      toast.error("Genre name cannot be empty");
+      return;
+    }
 
     try {
       const createdGenre = await createGenre(newGenreName);
-      setGenres([...genres, createdGenre]); // Update the genres state
-      setIsModalOpen(false); // Close the modal
-      setNewGenreName(""); // Reset the input
+      setGenres([...genres, createdGenre]);
+      setIsModalOpen(false);
+      setNewGenreName("");
       toast.success("Genre created successfully!");
     } catch (error) {
       console.error("Error creating genre:", error);
@@ -131,11 +164,20 @@ export default function ArticleForm({ article, editId }: ArticleFormProps) {
           required
         />
 
-        <input type="file" accept="image/png, image/jpeg , image/jpg" onChange={handleThumbnailChange} className="w-full border p-2" />
-        {thumbnailPreview && <img src={thumbnailPreview} alt="Thumbnail preview" className="w-full mt-2" />}
-        {!thumbnail && article?.thumbnail && (
-          <img src={getImageSrc(article?.thumbnail)} alt="Existing thumbnail" className="w-full mt-2" />
-        )}
+        <div className="relative w-full border p-2">
+          {thumbnailPreview ? (
+            <>
+              <img src={thumbnailPreview} alt="Thumbnail preview" className="w-full mt-2 h-3/4" />
+              <FaTimes
+                onClick={handleRemoveThumbnail}
+                className="absolute top-2 right-2 cursor-pointer text-red-600 bg-white rounded-full p-1"
+                size={20}
+              />
+            </>
+          ) : (
+            <input type="file" accept="image/png, image/jpeg, image/jpg" onChange={handleThumbnailChange} />
+          )}
+        </div>
 
         <h2 className="text-lg font-bold flex justify-between">
           Select Genres

@@ -15,7 +15,7 @@ export default function EditArticlePage() {
     const fetchArticle = async () => {
       try {
         const response = await axiosInstance.get(`${backendUrl}/api/articles/${editId}`);
-        setArticleData(response.data); // Set the existing article data
+        setArticleData(response.data); 
       } catch (error) {
         console.error("Error fetching article:", error);
       }
@@ -28,7 +28,7 @@ export default function EditArticlePage() {
 
   return (
     <div className="mb-5">
-      <h1 className="text-5xl m-8 text-center">Edit article {editId} here . . .</h1>
+      <h1 className="text-5xl m-8 text-center">Edit your article here . . .</h1>
       {/* Pass the fetched article data as props */}
       {articleData && <ArticleForm article={articleData} editId={editId} />}
     </div>

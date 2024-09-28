@@ -5,7 +5,6 @@ import { Op } from 'sequelize';
 import elasticClient from '../config/elasticsearch';
 import { emitArticleIndexed } from '..';
 import { getRecommendedArticles, trackArticleView } from '../services/recommendationService';
-
 const Article = db.articles;
 const User = db.users;
 const Genre = db.genres;
@@ -26,6 +25,7 @@ async function indexArticleInElasticsearch(article: any, genreIds: number[]) {
         author_id: article.author_id,
         thumbnail: article.thumbnail,
         genres: genreIds || [],
+        totalViews: parseInt(article.totalViews || '0', 10),
         createdAt: article.createdAt,
         updatedAt: article.updatedAt,
       },
@@ -208,7 +208,7 @@ export const createArticle = async (req: AuthRequest, res: Response): Promise<Re
     }
 
     // Index the new article in Elasticsearch (non-blocking)
-    indexArticleInElasticsearch(newArticle, genreIds);
+    await indexArticleInElasticsearch(newArticle, genreIds);
 
     return res.status(201).json(newArticle);
   } catch (error) {
@@ -239,7 +239,7 @@ export const updateArticle = async (req: AuthRequest, res: Response): Promise<Re
     }
 
     // Update the article in Elasticsearch (non-blocking)
-    indexArticleInElasticsearch(article, genreIds);
+    await indexArticleInElasticsearch(article, genreIds);
 
     return res.status(200).json(article);
   } catch (error) {

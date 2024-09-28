@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Articles } from "@/types/types";
 import Image from "next/image";
 import { convertDateFormat, getImageSrc } from "@/utils/sharedFunction";
+import { FaEye } from "react-icons/fa";
 
 interface ArticleCardProps {
   article: Articles;
@@ -52,8 +53,8 @@ export default function ArticleCard({
           Author: {article?.User?.name}
         </p>}
         {
-          article?.totalViews && <p className="text-xs text-gray-500 mb-2">
-            Views: {article?.totalViews}
+          article?.totalViews && <p className="text-xs text-gray-500 mb-2 flex">
+            <FaEye size={15}/> <span className="ml-1">{article?.totalViews}</span>
           </p>
         }
         <p className="text-xs text-gray-500 mb-2">

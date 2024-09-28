@@ -9,7 +9,7 @@ interface ArticleViewAttributes {
   unique_views: number;
 }
 
-class ArticleView extends Model<ArticleViewAttributes> implements ArticleViewAttributes {
+export class ArticleView extends Model<ArticleViewAttributes> implements ArticleViewAttributes {
   public id!: number;
   public visitor_id!: number;
   public article_id!: number;

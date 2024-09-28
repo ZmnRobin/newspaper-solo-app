@@ -84,6 +84,7 @@ const initializeElasticIndex = async () => {
             createdAt: { type: 'date' },
             updatedAt: { type: 'date' },
             genres: { type: 'integer' },
+            totalViews: { type: 'long' }
           },
         },
       },

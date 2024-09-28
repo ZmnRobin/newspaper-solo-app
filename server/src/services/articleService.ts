@@ -14,7 +14,8 @@ export const indexArticle = async (article: any) => {
         thumbnail: article.thumbnail,
         createdAt: article.createdAt,
         updatedAt: article.updatedAt,
-        genres: genres.map((genre: any) => genre.id), // Include only genre IDs
+        genres: genres.map((genre: any) => genre.id),
+        totalViews: parseInt(article.totalViews || '0', 10), // Initialize total views to 0
       },
     });
   } catch (error) {

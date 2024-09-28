@@ -15,7 +15,7 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [hasMore, setHasMore] = useState(true);
-  const {createdArticle} = useUser();
+  const {createdArticle,setCreatedArticle} = useUser();
 
   // Initialize the Socket.io client
   useEffect(() => {
@@ -75,11 +75,27 @@ export default function Home() {
         setLoading(false);
       }
     };
-    setTimeout(() => {
-      fetchArticles();
-    }
-    , 500);
+    fetchArticles();
   }, []);
+
+   // Watch for createdArticle state and refetch articles if necessary
+   useEffect(() => {
+    if (createdArticle) {
+      const fetchLatestArticles = async () => {
+        try {
+          const data = await getAllArticles(1); // Fetch the first page again
+          setArticles(data?.articles);
+          setPage(2); // Reset to the next page
+          setHasMore(true); // Reset the load more state
+        } catch (err) {
+          setError("Failed to fetch articles after creation");
+        } finally {
+          setCreatedArticle(false); // Reset the flag in context
+        }
+      };
+      fetchLatestArticles();
+    }
+  }, [createdArticle, setCreatedArticle]);
 
   return (
     <>
