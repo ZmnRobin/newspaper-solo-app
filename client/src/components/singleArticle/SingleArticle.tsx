@@ -23,25 +23,25 @@ export default function SingleArticle({ article }: SingleArticleProps) {
     setComments(data);
   };
 
-  const fetchRelatedArticles = async () => {
-    try {
-      setLoading(true);
-      const data = await getRelatedArticles(article.id);
-      setRelatedArticles(data?.articles);
-      setLoading(false);
-    }
-    catch (err) {
-      console.log(err);
-      toast.error("Failed to fetch related articles");
-      setLoading(false);
-    }
-  };
+  // const fetchRelatedArticles = async () => {
+  //   try {
+  //     setLoading(true);
+  //     const data = await getRelatedArticles(article.id);
+  //     setRelatedArticles(data?.articles);
+  //     setLoading(false);
+  //   }
+  //   catch (err) {
+  //     console.log(err);
+  //     toast.error("Failed to fetch related articles");
+  //     setLoading(false);
+  //   }
+  // };
 
   const fetchRecomendedArticles = async () => {
     try {
       setLoading(true);
-      const data = await getRecommensdedArticles(article.id, 5);
-      setRelatedArticles(data);
+      const data = await getRecommensdedArticles(article.id, 1);
+      setRelatedArticles(data?.articles);
 
       console.log(data);
       setLoading(false);

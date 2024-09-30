@@ -22,6 +22,7 @@ export type Articles = {
     createdAt: Date;
     updatedAt: Date;
     User: User;
+    author: User;
     Genres: Genre[];
     totalViews: string;
 }

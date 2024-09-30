@@ -1,10 +1,32 @@
 import elasticClient from '../config/elasticsearch';
+import { User } from '../models/User';
 
-export const getRecommendedArticles = async (userIp: string, limit: number, excludeArticleId?: number) => {
+interface RecommendedArticle {
+  id: string;
+  title: string;
+  content: string;
+  author: {
+    id: number;
+    name: string;
+  } | null;
+  thumbnail: string;
+  createdAt: string;
+  updatedAt: string;
+  totalViews: number;
+}
+
+export const getRecommendedArticles = async (
+  userIp: string,
+  limit: number,
+  page: number,
+  excludeArticleId?: number
+): Promise<{ articles: RecommendedArticle[], total: number }> => {
   try {
+    const from = (page - 1) * limit;
     const recommendedArticles = await elasticClient.search({
       index: 'articles',
       body: {
+        from,
         size: limit,
         query: {
           bool: {
@@ -20,22 +42,51 @@ export const getRecommendedArticles = async (userIp: string, limit: number, excl
       }
     });
 
-    return recommendedArticles.hits.hits.map((hit: any) => ({
-      id: hit._id,
-      ...hit._source,
-      totalViews: hit._source.totalViewsLong || 0
-    }));
+    const total = recommendedArticles.hits.total?.valueOf ?? 0;
+    const articleHits = recommendedArticles.hits.hits;
+
+    // Fetch author information for all articles at once
+    const authorIds = [...new Set(articleHits.map((hit: any) => hit._source.author_id))];
+    const authors = await User.findAll({
+      where: { id: authorIds },
+      attributes: ['id', 'name']
+    });
+
+    const authorsMap = new Map(authors.map(author => [author.id, author]));
+
+    const articles: RecommendedArticle[] = articleHits.map((hit: any) => {
+      const author = authorsMap.get(hit._source.author_id);
+      return {
+        id: hit._id,
+        title: hit._source.title,
+        content: hit._source.content,
+        author: author ? {
+          id: author.id,
+          name: author.name,
+        } : null,
+        thumbnail: hit._source.thumbnail,
+        createdAt: hit._source.createdAt,
+        updatedAt: hit._source.updatedAt,
+        totalViews: hit._source.totalViewsLong || 0
+      };
+    });
+
+    return { articles, total: typeof recommendedArticles.hits.total?.valueOf === 'function' 
+      ? Number(recommendedArticles.hits.total.valueOf()) 
+      : Number(recommendedArticles.hits.total) ?? 0 };
   } catch (error) {
     console.error('Error getting recommended articles:', error);
-    return [];
+    return { articles: [], total: 0 };
   }
 };
 
-export const getPopularArticles = async (limit: number = 10) => {
+export const getPopularArticles = async (limit: number = 10, page: number = 1) => {
   try {
+    const from = (page - 1) * limit;
     const popularArticles = await elasticClient.search({
       index: 'articles',
       body: {
+        from,
         size: limit,
         sort: [
           { totalViewsLong: { order: 'desc' } },
@@ -44,14 +95,41 @@ export const getPopularArticles = async (limit: number = 10) => {
       }
     });
 
-    return popularArticles.hits.hits.map((hit: any) => ({
-      id: hit._id,
-      ...hit._source,
-      totalViews: hit._source.totalViewsLong || 0
-    }));
+    const total = typeof popularArticles.hits.total?.valueOf === 'function' 
+      ? popularArticles.hits.total.valueOf() 
+      : popularArticles.hits.total ?? 0;
+    const articleHits = popularArticles.hits.hits;
+
+    // Fetch author information for all articles at once
+    const authorIds = [...new Set(articleHits.map((hit: any) => hit._source.author_id))];
+    const authors = await User.findAll({
+      where: { id: authorIds },
+      attributes: ['id', 'name']
+    });
+
+    const authorsMap = new Map(authors.map(author => [author.id, author]));
+
+    const articles: RecommendedArticle[] = articleHits.map((hit: any) => {
+      const author = authorsMap.get(hit._source.author_id);
+      return {
+        id: hit._id,
+        title: hit._source.title,
+        content: hit._source.content,
+        author: author ? {
+          id: author.id,
+          name: author.name,
+        } : null,
+        thumbnail: hit._source.thumbnail,
+        createdAt: hit._source.createdAt,
+        updatedAt: hit._source.updatedAt,
+        totalViews: hit._source.totalViewsLong || 0
+      };
+    });
+
+    return { articles, total };
   } catch (error) {
     console.error('Error getting popular articles:', error);
-    return [];
+    return { articles: [], total: 0 };
   }
 };
 

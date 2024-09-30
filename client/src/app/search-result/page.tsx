@@ -16,13 +16,13 @@ export default function SearchResult() {
   const query = searchParams.get("query");
   const [hasMore, setHasMore] = useState(true); 
 
-  // Fetch more searchd articles when scrolling reaches the end
+  // Fetch more search articles when scrolling reaches the end
   const fetchMoreArticles = async () => {
     if (!hasMore) return; // Stop if no more data
     try {
-      const data = await searchArticles(query,page); // Fetch next page of articles
+      const data = await searchArticles(query, page); // Fetch next page of articles
       if (data?.articles?.length > 0) {
-        setResults((prev) => [...prev, ...data?.articles]);
+        setResults((prev) => [...prev, ...data.articles]);
         setPage((prev) => prev + 1);
       } else {
         setHasMore(false); // No more articles to fetch
@@ -40,10 +40,11 @@ export default function SearchResult() {
   useEffect(() => {
     const fetchArticles = async () => {
       setLoading(true);
+      setPage(1); // Reset page to 1 for a new search
+      setHasMore(true); // Reset hasMore to true for a new search
       try {
-        const data = await searchArticles(query,page);
-        setResults(data?.articles);
-        setPage((prev) => prev + 1);
+        const data = await searchArticles(query, 1); // Always start with page 1
+        setResults(data?.articles || []);
         setLoading(false);
       } catch (err) {
         console.error("Failed to fetch articles");
@@ -52,7 +53,7 @@ export default function SearchResult() {
       }
     };
     fetchArticles();
-  }, [query]);
+  }, [query]); // Run effect whenever `query` changes
 
   if (loading) {
     return (
@@ -75,13 +76,13 @@ export default function SearchResult() {
   return (
     <div className="container mx-auto w-9/12 p-5">
       <h1 className="text-3xl font-semibold mb-4">
-      <span className="text-2xl text-gray-400">Search results for </span>"{query}".
+        <span className="text-2xl text-gray-400">Search results for </span>"{query}".
       </h1>
       {results.map((article) => (
         <SearchCard key={article.id} article={article} />
       ))}
       {isFetching && hasMore && (
-        <CustomLoader/>
+        <CustomLoader />
       )}
     </div>
   );

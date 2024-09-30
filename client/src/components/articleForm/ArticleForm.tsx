@@ -167,7 +167,7 @@ export default function ArticleForm({ article, editId }: ArticleFormProps) {
         <div className="relative w-full border p-2">
           {thumbnailPreview ? (
             <>
-              <img src={thumbnailPreview} alt="Thumbnail preview" className="w-full mt-2 h-3/4" />
+              <img src={thumbnailPreview} alt="Thumbnail preview" className="w-full mt-2" />
               <FaTimes
                 onClick={handleRemoveThumbnail}
                 className="absolute top-2 right-2 cursor-pointer text-red-600 bg-white rounded-full p-1"

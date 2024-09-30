@@ -40,26 +40,37 @@ export default function ArticleCard({
       </Link>
       <div className="pt-4">
         <Link href={`/${article?.id}`} className="hover:text-blue-500">
-          {" "}
           <h1
             className={`mb-2 ${
-              featured ? "text-6xl" : mediumFeature ? "text-3xl line-clamp-2" : "text-2xl line-clamp-2"
+              featured
+                ? "text-6xl"
+                : mediumFeature
+                ? "text-3xl line-clamp-2"
+                : "text-2xl line-clamp-2"
             }`}
           >
             {article?.title}
           </h1>
         </Link>
-        {article?.User?.name && <p className="text-xs text-gray-500 mb-2">
-          Author: {article?.User?.name}
-        </p>}
-        {
-          article?.totalViews && <p className="text-xs text-gray-500 mb-2 flex">
-            <FaEye size={15}/> <span className="ml-1">{article?.totalViews}</span>
+        {article?.User?.name && (
+          <p className="text-xs text-gray-500 mb-2">
+            Author: {article?.User?.name}
           </p>
-        }
-        <p className="text-xs text-gray-500 mb-2">
-          {convertDateFormat(article?.createdAt.toString())}
-        </p>
+        )}
+        {article?.author?.name && (
+          <p className="text-xs text-gray-500 mb-2">
+            Author: {article?.author?.name}
+          </p>
+        )}
+        <div className="flex justify-between items-center text-xs text-gray-500 mb-2">
+          <span>{convertDateFormat(article?.createdAt.toString())}</span>
+          {article?.totalViews && (
+            <div className="flex items-center">
+              <FaEye size={15} />
+              <span className="ml-1">{article?.totalViews}</span>
+            </div>
+          )}
+        </div>
         <p className="text-xs text-gray-500 mb-2 line-clamp-1">
           {article?.Genres?.map((genre: any) => genre.name).join(" / ")}
         </p>

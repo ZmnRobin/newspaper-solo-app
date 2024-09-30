@@ -13,7 +13,7 @@ export default function RelatedArticles({ articles }: RelatedArticlesProps) {
   return (
     <div className="lg:col-span-3">
       <div className="bg-white shadow p-4">
-        <h2 className="font-bold text-xl mb-4">Recommended</h2>
+        <h2 className="font-bold text-xl mb-4">Related Articles</h2>
         <div className="space-y-4">
           {articles?.map((article) => (
             <div key={article.id}>
@@ -36,12 +36,13 @@ export default function RelatedArticles({ articles }: RelatedArticlesProps) {
                 <p className="text-xs text-gray-500 mb-1 line-clamp-1">
                   {article?.Genres?.map((genre: any) => genre.name).join(" / ")}
                 </p>
-                <p className="text-sm text-gray-500">
+                <div className="flex justify-between items-center text-sm text-gray-500">
                   <span>{convertDateFormat(article.createdAt.toString())}</span>
-                </p>
-                <p className="text-sm text-gray-500 flex">
-                  <FaEye size={15}/> <span className="ml-1">{article?.totalViews}</span>
-                </p>
+                  <div className="flex items-center">
+                    <FaEye size={15} />
+                    <span className="ml-1">{article?.totalViews}</span>
+                  </div>
+                </div>
               </div>
             </div>
           ))}
